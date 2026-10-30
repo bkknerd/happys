@@ -1,0 +1,50 @@
+{
+  "heading": "events",
+  "items": [
+    {
+      "label": "every saturday",
+      "title": "live music",
+      "body": "a local act every saturday night. here’s who’s playing this month.",
+      "lineup_title": "october music",
+      "lineup": [
+        {
+          "date": "2026-10-03",
+          "genre": "classic hits",
+          "artist": "Steve Holcomb"
+        },
+        {
+          "date": "2026-10-10",
+          "genre": "pop/rock hits",
+          "artist": "Matt from Boston"
+        },
+        {
+          "date": "2026-10-17",
+          "genre": "pop/rock hits",
+          "artist": "Shane Bullis"
+        },
+        {
+          "date": "2026-10-24",
+          "genre": "newgrass/pop hits",
+          "artist": "Brian & Cheyenne"
+        },
+        {
+          "date": "2026-10-31",
+          "genre": "pop/rock hits",
+          "artist": "Chris Overstreet"
+        }
+      ],
+      "poster": "images/uploads/october-music.webp",
+      "button_text": "follow for next month ↗",
+      "button_link": "https://www.instagram.com/happyscary/",
+      "color": "yellow"
+    },
+    {
+      "label": "birthdays · work nights",
+      "title": "book the bar",
+      "body": "throw your thing at happy’s. tell us the date, how many people, and what you have in mind.",
+      "button_text": "ask about a date",
+      "button_link": "mailto:thewalkupcary@gmail.com?subject=Private%20event%20at%20happy%E2%80%99s&body=Date%3A%0AHow%20many%20people%3A%0AWhat%20you%20have%20in%20mind%3A",
+      "color": "pink"
+    }
+  ]
+}

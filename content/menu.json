@@ -1,0 +1,397 @@
+{
+  "heading": "the menu",
+  "search_placeholder": "find a drink or a snack…",
+  "empty_message": "nothing like that on the menu. yet.",
+  "categories": [
+    {
+      "title": "house specials",
+      "filter": "specials",
+      "price_tag": "",
+      "color": "lavender",
+      "note": "",
+      "items": [
+        {
+          "name": "feel good",
+          "price": "9",
+          "description": "Coors Lite draft and a shot of house whiskey or tequila"
+        },
+        {
+          "name": "jello shots",
+          "price": "1 for 2 · 3 for 5",
+          "description": "Old Fashioned, Strawberry Daiquiri, Midori Sour"
+        },
+        {
+          "name": "old fashioned",
+          "price": "10",
+          "description": "Whiskey, simple, bitters"
+        },
+        {
+          "name": "orange crush",
+          "price": "11",
+          "description": "Sup Crush orange vodka, orange juice, Sprite"
+        },
+        {
+          "name": "sweet lady",
+          "price": "11",
+          "description": "Empress gin, sage syrup, lemon"
+        },
+        {
+          "name": "happy’s margarita",
+          "price": "10",
+          "description": "Tequila, Cointreau, lime, agave"
+        },
+        {
+          "name": "date night",
+          "price": "10",
+          "description": "Bourbon, grapefruit, lemon, simple"
+        },
+        {
+          "name": "happy tai",
+          "price": "11",
+          "description": "Light rum, Cointreau, lime, orgeat, dark rum float"
+        },
+        {
+          "name": "spicy margarita",
+          "price": "10",
+          "description": "House-infused blanco tequila, Cointreau, lime juice, agave"
+        },
+        {
+          "name": "happy mojito",
+          "price": "12",
+          "description": "House-infused mint rum, lime juice, simple syrup, club soda"
+        }
+      ]
+    },
+    {
+      "title": "happy’s house cocktails",
+      "filter": "cocktails",
+      "price_tag": "",
+      "color": "pink",
+      "note": "",
+      "items": [
+        {
+          "name": "happy long island",
+          "price": "10",
+          "description": "Vodka, rum, gin, tequila, Cointreau, lemon, simple, Coke"
+        },
+        {
+          "name": "tequila sunrise",
+          "price": "10",
+          "description": "Tequila, orange juice, grenadine"
+        },
+        {
+          "name": "gold rush",
+          "price": "10",
+          "description": "Whiskey, lemon, honey"
+        },
+        {
+          "name": "moscow mule",
+          "price": "10",
+          "description": "Vodka, lime, ginger beer"
+        },
+        {
+          "name": "aperol spritz",
+          "price": "12",
+          "description": "Aperol, cava, club soda"
+        },
+        {
+          "name": "dark and stormy",
+          "price": "10",
+          "description": "Dark rum, lime, ginger beer"
+        },
+        {
+          "name": "tom collins",
+          "price": "10",
+          "description": "Gin, lemon, simple, club soda"
+        },
+        {
+          "name": "whiskey sour",
+          "price": "10",
+          "description": "Whiskey, lemon, simple"
+        },
+        {
+          "name": "painkiller",
+          "price": "12",
+          "description": "Rum, pineapple, orange, Coco Real, nutmeg"
+        }
+      ]
+    },
+    {
+      "title": "draft",
+      "filter": "beer",
+      "price_tag": "5.5",
+      "color": "yellow",
+      "note": "make it a pitcher! 18",
+      "items": [
+        {
+          "name": "coors light",
+          "price": "5.5",
+          "description": ""
+        },
+        {
+          "name": "trophy cloud surfer ipa",
+          "price": "5.5",
+          "description": ""
+        },
+        {
+          "name": "wilmington pretty peach wheat",
+          "price": "5.5",
+          "description": ""
+        },
+        {
+          "name": "hopfly beach beer session",
+          "price": "5.5",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "not draft",
+      "filter": "beer",
+      "price_tag": "",
+      "color": "blue",
+      "note": "",
+      "items": [
+        {
+          "name": "modelito 7oz",
+          "price": "3",
+          "description": ""
+        },
+        {
+          "name": "yuengling",
+          "price": "4",
+          "description": ""
+        },
+        {
+          "name": "coors banquet",
+          "price": "4",
+          "description": ""
+        },
+        {
+          "name": "miller lite",
+          "price": "4",
+          "description": ""
+        },
+        {
+          "name": "topo chico seltzer",
+          "price": "4",
+          "description": ""
+        },
+        {
+          "name": "noble bone dry cider",
+          "price": "4",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "shots shots shots",
+      "filter": "shots",
+      "price_tag": "5",
+      "color": "orange",
+      "note": "",
+      "items": [
+        {
+          "name": "lemon drop",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "kamikaze",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "green tea",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "white tea",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "espresso martini",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "orange creamsicle",
+          "price": "5",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "non-alcoholic",
+      "filter": "zero",
+      "price_tag": "",
+      "color": "mint",
+      "note": "",
+      "items": [
+        {
+          "name": "athletic ipa",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "athletic golden",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "guinness 0.0",
+          "price": "5",
+          "description": ""
+        },
+        {
+          "name": "anytime seltzer",
+          "price": "5",
+          "description": "CBD 15mg, THC 5mg"
+        },
+        {
+          "name": "modified behavior",
+          "price": "8",
+          "description": "Grapefruit juice, lime juice, agave, club soda, sparkling wine"
+        },
+        {
+          "name": "jones street",
+          "price": "5",
+          "description": "Cranberry, sage, lemon, ginger beer"
+        },
+        {
+          "name": "sonrie sparkling wine",
+          "price": "9",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "wiiiiiiine",
+      "filter": "wine",
+      "price_tag": "10",
+      "color": "lavender",
+      "note": "buy the bottle! 30",
+      "items": [
+        {
+          "name": "cava sparkling",
+          "price": "10",
+          "description": ""
+        },
+        {
+          "name": "cabernet sauvignon",
+          "price": "10",
+          "description": ""
+        },
+        {
+          "name": "pinot noir",
+          "price": "10",
+          "description": ""
+        },
+        {
+          "name": "pinot grigio",
+          "price": "10",
+          "description": ""
+        },
+        {
+          "name": "sauvignon blanc nz",
+          "price": "10",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "hot snacks",
+      "filter": "food",
+      "price_tag": "",
+      "color": "yellow",
+      "note": "",
+      "items": [
+        {
+          "name": "happy’s personal pizza · cheese only",
+          "price": "7",
+          "description": ""
+        },
+        {
+          "name": "happy’s personal pizza · pepperoni",
+          "price": "8",
+          "description": ""
+        },
+        {
+          "name": "happy’s grilled cheese",
+          "price": "7",
+          "description": "Chorizo, pimento cheese, fontina cheese, giardiniera, Happy’s sauce"
+        },
+        {
+          "name": "pub tenders",
+          "price": "8",
+          "description": "All served with veggies. Your choice of: pub mix seasoning with Happy’s sauce · house buffalo with house ranch · BBQ with house ranch"
+        }
+      ]
+    },
+    {
+      "title": "cold snacks",
+      "filter": "food",
+      "price_tag": "",
+      "color": "lavender",
+      "note": "",
+      "items": [
+        {
+          "name": "pub mix",
+          "price": "6",
+          "description": "NC peanuts, Chex, pretzel, Cheez It, oyster cracker, Old Bay seasoning"
+        },
+        {
+          "name": "pimento cheese",
+          "price": "7",
+          "description": "Served with veggies and crackers"
+        },
+        {
+          "name": "caramelized onion dip",
+          "price": "7",
+          "description": "Served with Ruffles and veggies"
+        },
+        {
+          "name": "charcuterie tray",
+          "price": "14",
+          "description": "Cheddar, fontina, salami, chorizo, house pickles, olives, house apple jelly, crackers"
+        }
+      ]
+    },
+    {
+      "title": "hot dogs",
+      "filter": "food",
+      "price_tag": "",
+      "color": "pink",
+      "note": "1 for 3 · 2 for 5. hot dog of the month: oktoberfest",
+      "items": [
+        {
+          "name": "bacon and cheese",
+          "price": "",
+          "description": "Bacon, pimento cheese"
+        },
+        {
+          "name": "happy’s style",
+          "price": "",
+          "description": "Happy’s sauce, giardiniera"
+        },
+        {
+          "name": "carolina",
+          "price": "",
+          "description": "House slaw, chili, mustard"
+        },
+        {
+          "name": "chili",
+          "price": "",
+          "description": "Chili, cheddar, onion"
+        },
+        {
+          "name": "plain",
+          "price": "only $2!",
+          "description": "Ketchup, mustard"
+        }
+      ]
+    }
+  ]
+}

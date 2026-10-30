@@ -1,0 +1,30 @@
+{
+  "heading": "lately\nat happy’s",
+  "items": [
+    {
+      "image": "images/uploads/sticker-wall-table.webp",
+      "caption": "the sticker wall",
+      "alt": "A high-top table and black stools in front of a wall covered in smiley stickers, a TV showing games above it"
+    },
+    {
+      "image": "images/uploads/espresso-martini.webp",
+      "caption": "espresso martini",
+      "alt": "An espresso martini on a table inside happy’s, string lights and the bar behind it"
+    },
+    {
+      "image": "images/uploads/snack-box.webp",
+      "caption": "snack box",
+      "alt": "A snack tray of salami, cheese, olives, crackers and pickles on a table painted with the happy’s feel good logo"
+    },
+    {
+      "image": "images/uploads/personal-pizza.webp",
+      "caption": "personal pizza",
+      "alt": "A personal pepperoni pizza on the patio table outside"
+    },
+    {
+      "image": "images/uploads/crush-cups.webp",
+      "caption": "orange crush",
+      "alt": "Two crush cocktails in front of the smiley-sticker wall"
+    }
+  ]
+}

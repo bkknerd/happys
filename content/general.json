@@ -1,0 +1,44 @@
+{
+ "hero": {
+  "image": "images/uploads/hero-smiley-wall.webp",
+  "topline_left": "cocktail bar",
+  "topline_left_extra": "& event space",
+  "topline_right": "cary, nc · 21+",
+  "topline_right_extra": "downtown",
+  "line_1": "come by.",
+  "line_2": "feel good",
+  "menu_button": "view menu",
+  "visit_button": "hours & location"
+ },
+ "contact": {
+  "street": "126 W Chatham St #200",
+  "address_note": "1st floor",
+  "city": "Cary",
+  "state": "NC",
+  "zip": "27511",
+  "phone": "(919) 378-9009",
+  "email": "thewalkupcary@gmail.com",
+  "instagram": "happyscary",
+  "directions_url": "https://www.google.com/maps/dir//126+W+Chatham+St+%23200,+Cary,+NC+27511"
+ },
+ "newsletter": {
+  "heading": "stay\nin the loop",
+  "body": "sign up to stay up to date on happy happenings.",
+  "placeholder": "drop your email here",
+  "button": "subscribe now",
+  "thanks": "thanks for the interest, didn’t that feel good?"
+ },
+ "walk_up": {
+  "eyebrow": "one flight up",
+  "description": "our upstairs cocktail bar. same building as happy’s, just up the stairs.",
+  "instagram": "thewalkupcary"
+ },
+ "footer": {
+  "note": "21+ only · No reservations"
+ },
+ "visit": {
+  "image": "images/uploads/storefront.webp",
+  "caption": "126 w chatham. the black door, ground floor.",
+  "alt": "The white brick front of happy’s on West Chatham Street, a black door with the happy’s logo and must be 21+"
+ }
+}

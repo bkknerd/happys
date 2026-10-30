@@ -1,0 +1,217 @@
+# Decap CMS for happy's. The editor lives at /admin.
+# Every change saves a commit to the GitHub repo, and the host redeploys the site.
+
+backend:
+  name: github
+  repo: OWNER/happys-site   # ← change to the real GitHub repo (owner/name)
+  branch: main
+  # Sign-in goes through Netlify's GitHub OAuth (Site settings → Access & security → OAuth → GitHub).
+  # Hosting somewhere else? Point base_url at your own OAuth proxy instead.
+
+# Lets you test the editor on your machine: run `npx decap-server` in this folder, then open /admin.
+local_backend: true
+
+site_url: https://happysnc.com
+display_url: https://happysnc.com
+logo_url: /images/uploads/hero-smiley-wall.webp
+
+media_folder: images/uploads
+public_folder: images/uploads
+
+collections:
+  - name: site
+    label: Site content
+    editor: { preview: false }
+    files:
+
+      # ───────────────────────── HOURS
+      - name: hours
+        label: Hours
+        file: content/hours.json
+        format: json
+        fields:
+          - label: Open days
+            name: days
+            widget: list
+            summary: "{{fields.day}}: {{fields.open}} – {{fields.close}}"
+            hint: Only list the days you're open. Any day not listed shows as closed. Write times like 4pm, 12am or 11:30pm.
+            fields:
+              - { label: Day, name: day, widget: select, options: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday] }
+              - { label: Opens, name: open, widget: string, pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 4pm or 4:30pm'] }
+              - { label: Closes, name: close, widget: string, pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 12am or 11pm'] }
+          - { label: Small note under the hours, name: note, widget: string, required: false }
+
+      # ───────────────────────── MENU
+      - name: menu
+        label: Menu
+        file: content/menu.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: string }
+          - { label: Search box placeholder, name: search_placeholder, widget: string }
+          - { label: Message when a search finds nothing, name: empty_message, widget: string }
+          - label: Menu sections
+            name: categories
+            widget: list
+            summary: "{{fields.title}}"
+            hint: Drag sections to reorder them on the page.
+            fields:
+              - { label: Section title, name: title, widget: string }
+              - label: Filter button it belongs to
+                name: filter
+                widget: select
+                options:
+                  - { label: specials, value: specials }
+                  - { label: cocktails, value: cocktails }
+                  - { label: beer, value: beer }
+                  - { label: shots, value: shots }
+                  - { label: zero proof, value: zero }
+                  - { label: wine, value: wine }
+                  - { label: food, value: food }
+              - { label: Price next to the title (optional), name: price_tag, widget: string, required: false, hint: "For sections where everything costs the same, like 5" }
+              - label: Color
+                name: color
+                widget: select
+                options: [yellow, pink, blue, orange, lavender, mint]
+              - { label: Highlighted note (optional), name: note, widget: string, required: false, hint: "Shows in a yellow band under the title, like: make it a pitcher! 18" }
+              - label: Items
+                name: items
+                widget: list
+                summary: "{{fields.name}} {{fields.price}}"
+                fields:
+                  - { label: Name, name: name, widget: string }
+                  - { label: Price, name: price, widget: string, required: false, hint: "Just the number, like 10. Leave blank if it's covered by the section." }
+                  - { label: Description (optional), name: description, widget: string, required: false }
+
+      # ───────────────────────── EVENTS
+      - name: events
+        label: Events
+        file: content/events.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: string }
+          - label: Event cards
+            name: items
+            widget: list
+            summary: "{{fields.title}}"
+            hint: Remove every card to hide the events section.
+            fields:
+              - { label: Small label, name: label, widget: string, required: false, hint: "Like: every saturday" }
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: body, widget: text, required: false }
+              - { label: Lineup heading (optional), name: lineup_title, widget: string, required: false, hint: "Like: november music" }
+              - label: Lineup (optional)
+                name: lineup
+                widget: list
+                required: false
+                summary: "{{fields.date}} · {{fields.artist}}"
+                hint: One row per show. Past dates get crossed out on their own, and the next show is marked.
+                fields:
+                  - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "MMM D, YYYY", time_format: false, picker_utc: true }
+                  - { label: Who's playing, name: artist, widget: string }
+                  - { label: Style, name: genre, widget: string, required: false, hint: "Like: pop/rock hits" }
+              - { label: Poster (optional), name: poster, widget: image, required: false, choose_url: false, hint: "The month's flyer. Shows as a small tilted thumbnail that opens full size." }
+              - { label: Button text, name: button_text, widget: string, required: false }
+              - { label: Button link, name: button_link, widget: string, required: false, hint: "A web address, or mailto:someone@email.com" }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+
+      # ───────────────────────── PHOTOS
+      - name: photos
+        label: Photos
+        file: content/photos.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: text, hint: "A line break here shows as a line break on the page." }
+          - label: Photos
+            name: items
+            widget: list
+            summary: "{{fields.caption}}"
+            hint: Five looks best. Square photos at least 900px wide.
+            fields:
+              - { label: Photo, name: image, widget: image, choose_url: false }
+              - { label: Caption, name: caption, widget: string }
+              - { label: Description for screen readers, name: alt, widget: string, hint: "What's in the photo, in a sentence." }
+
+      # ───────────────────────── REVIEWS
+      - name: reviews
+        label: Reviews
+        file: content/reviews.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: text }
+          - { label: Star rating, name: rating, widget: number, value_type: float, min: 0, max: 5, step: 0.1 }
+          - { label: Number of reviews, name: count, widget: number, value_type: int, min: 0 }
+          - { label: Where the reviews are, name: source, widget: string }
+          - { label: Link to the reviews, name: reviews_link, widget: string }
+          - { label: Tags, name: tags, widget: list, field: { label: Tag, name: tag, widget: string } }
+          - label: Quotes
+            name: quotes
+            widget: list
+            summary: "{{fields.who}}"
+            hint: Keep them short and word-for-word from the review.
+            fields:
+              - { label: Quote, name: text, widget: text }
+              - { label: Who said it, name: who, widget: string, hint: "Like: sherie g. · google" }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+
+      # ───────────────────────── EVERYTHING ELSE
+      - name: general
+        label: Contact, hero & the rest
+        file: content/general.json
+        format: json
+        fields:
+          - label: Contact
+            name: contact
+            widget: object
+            fields:
+              - { label: Street, name: street, widget: string }
+              - { label: Address note, name: address_note, widget: string, required: false }
+              - { label: City, name: city, widget: string }
+              - { label: State, name: state, widget: string }
+              - { label: ZIP, name: zip, widget: string }
+              - { label: Phone, name: phone, widget: string }
+              - { label: Email, name: email, widget: string }
+              - { label: Instagram handle (no @), name: instagram, widget: string }
+              - { label: Directions link, name: directions_url, widget: string }
+          - label: Top of the page
+            name: hero
+            widget: object
+            fields:
+              - { label: Background photo, name: image, widget: image, choose_url: false }
+              - { label: Headline line 1, name: line_1, widget: string }
+              - { label: Headline line 2 (the smiley follows it), name: line_2, widget: string }
+              - { label: Top-left label, name: topline_left, widget: string }
+              - { label: Top-left extra (hidden on small phones), name: topline_left_extra, widget: string, required: false }
+              - { label: Top-right label, name: topline_right, widget: string }
+              - { label: Top-right extra (hidden on phones), name: topline_right_extra, widget: string, required: false }
+              - { label: Menu button, name: menu_button, widget: string }
+              - { label: Hours button, name: visit_button, widget: string }
+          - label: Email signup
+            name: newsletter
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: text }
+              - { label: Text, name: body, widget: string }
+              - { label: Email box placeholder, name: placeholder, widget: string }
+              - { label: Button, name: button, widget: string }
+              - { label: Thank-you message, name: thanks, widget: string }
+          - label: The walk up (upstairs screen)
+            name: walk_up
+            widget: object
+            fields:
+              - { label: Small label, name: eyebrow, widget: string }
+              - { label: Description, name: description, widget: text }
+              - { label: Instagram handle (no @), name: instagram, widget: string }
+          - label: Storefront photo (next to the hours)
+            name: visit
+            widget: object
+            required: false
+            fields:
+              - { label: Photo, name: image, widget: image, required: false, choose_url: false }
+              - { label: Caption, name: caption, widget: string, required: false }
+              - { label: Description for screen readers, name: alt, widget: string, required: false }
+          - label: Footer
+            name: footer
+            widget: object
+            fields:
+              - { label: Footer note, name: note, widget: string }

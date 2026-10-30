@@ -1,0 +1,30 @@
+{
+  "heading": "people\nare into it",
+  "rating": 4.8,
+  "count": 26,
+  "source": "google",
+  "reviews_link": "https://www.google.com/search?q=happys+cary+nc+reviews",
+  "tags": [
+    "cocktail bar",
+    "$10–20 / person",
+    "outdoor seating",
+    "great cocktails"
+  ],
+  "quotes": [
+    {
+      "text": "seriously, awesome atmosphere, drinks and bites of food at great price.",
+      "who": "google review",
+      "color": "yellow"
+    },
+    {
+      "text": "the service is always incredible the esthetic is so cute and welcoming.",
+      "who": "sherie g. · google",
+      "color": "pink"
+    },
+    {
+      "text": "a great place to … settle in and watch a football or hockey game.",
+      "who": "mathew d. · google",
+      "color": "blue"
+    }
+  ]
+}
