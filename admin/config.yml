@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: OWNER/happys-site   # ← change to the real GitHub repo (owner/name)
+  repo: bkknerd/happys
   branch: main
   # Sign-in goes through Netlify's GitHub OAuth (Site settings → Access & security → OAuth → GitHub).
   # Hosting somewhere else? Point base_url at your own OAuth proxy instead.
@@ -201,6 +201,7 @@ collections:
             fields:
               - { label: Small label, name: eyebrow, widget: string }
               - { label: Description, name: description, widget: text }
+              - { label: The Walk Up's website, name: url, widget: string, hint: "Where the stairs lead. After the climb, visitors land here." }
               - { label: Instagram handle (no @), name: instagram, widget: string }
           - label: Storefront photo (next to the hours)
             name: visit

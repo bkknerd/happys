@@ -1,0 +1,12 @@
+{
+  "name": "happys-site",
+  "private": true,
+  "description": "happy's (Cary, NC) site. Content lives in /content and is edited at /admin.",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "jsdom": "24.1.3"
+  }
+}

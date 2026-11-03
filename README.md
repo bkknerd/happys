@@ -1,6 +1,6 @@
 # happy’s — site + CMS
 
-The site is static, with no build step. Every word, price, hour and photo lives in `content/*.json`, and the owner edits those through Decap CMS at `/admin`.
+Every word, price, hour and photo lives in `content/*.json`, and the owner edits those through Decap CMS at `/admin`. On each deploy, Netlify runs a small build that bakes that content into the page, so visitors and search engines get the full menu, hours, lineup and schema in the first response, with no loading step.
 
 ```
 index.html          the page (design + code, rarely touched)
@@ -13,7 +13,9 @@ content/            everything the owner can change
   reviews.json      rating, tags, quotes
 images/uploads/     photos (new uploads from the CMS land here too)
 admin/              the CMS (index.html + config.yml)
-netlify.toml        hosting settings (headers, /admin redirect)
+netlify.toml        hosting settings (build command, headers, /admin redirect)
+scripts/build.mjs   the deploy build: copies the site to dist/ and pre-renders index.html
+package.json        one dependency (jsdom) for the build
 404.html            "wrong door" page
 robots.txt, sitemap.xml, favicon.svg
 ```
@@ -35,7 +37,7 @@ Open `admin/config.yml` and change `repo: OWNER/happys-site` to your real `user/
 
 ### 3. Netlify
 - **Add new site → Import an existing project → GitHub →** pick the repo.
-- Leave the build command blank. The publish directory is `.`, and `netlify.toml` already sets that.
+- Leave the build settings alone: `netlify.toml` already sets the build command (`npm run build`), the publish folder (`dist`) and Node 20.
 - Deploy.
 
 ### 4. Turn on the email signup
@@ -66,10 +68,21 @@ npx serve .             # or any static server, in a second terminal
 
 Open `http://localhost:3000/admin` and click **Login**. Changes write straight to the files here; that's what the `local_backend: true` line in the config does.
 
-Opening `index.html` by double-clicking won't work: the page loads its content with `fetch`, which needs a server. The email signup only works on Netlify.
+Opening `index.html` by double-clicking won't work: without the build, the page loads its content with `fetch`, which needs a server. The email signup only works on Netlify.
+
+To see exactly what Netlify will ship:
+
+```
+npm install
+npm run build           # writes dist/
+npx serve dist
+```
+
+The build fails on purpose if a content file is broken or the menu renders empty, so a bad edit never replaces the live site; Netlify keeps the last good deploy.
 
 ## Notes
 
+- **Phones:** menu sections fold up on screens 600px wide or less. The first section starts open, and searching or tapping a filter opens whatever matches. The poster is hidden on phones because the lineup already lists the same shows.
 - **Hours:** list only the days you're open; any day left out shows as "closed". Write times like `4pm`, `12am` or `11:30pm`. The week, the footer, today's highlight and the Google schema all come from this one list.
 - **Music lineup:** each month, go to Events → live music, replace the rows and upload the new poster. Past dates cross themselves out and the next show is marked. Upcoming shows also go into the page's search data as events.
 - **Colors** are picked by name (yellow, pink, blue, orange, lavender, mint), so cards always stay on-brand.

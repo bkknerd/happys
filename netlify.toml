@@ -1,6 +1,11 @@
-# Netlify settings for happy's. No build step: the repo root is the site.
+# Netlify settings for happy's.
+# The build bakes /content into index.html (see scripts/build.mjs) and publishes dist/.
 [build]
-  publish = "."
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
 
 # The CMS editor should never show up in search.
 [[headers]]
