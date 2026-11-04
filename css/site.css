@@ -44,7 +44,8 @@ h2{font-size:clamp(44px,9vw,120px);margin-bottom:28px}
 .cat .note{padding:10px 20px;background:var(--pop);color:#1d1410;border-bottom:1.5px solid var(--ink)}
 .cat ul{list-style:none;margin:0;padding:6px 8px 10px}
 .cat-toggle{all:unset;display:flex;align-items:baseline;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;cursor:default}.cat-toggle:focus-visible{outline:2px solid #1d1410;outline-offset:4px}.cat-toggle .pm{display:none}
-@media(max-width:600px){.cat-toggle{cursor:pointer}.cat-toggle .pm{display:inline-block;font:700 26px/1 "Space Mono",monospace;flex:none;width:1ch;text-align:center}.cat-toggle .pm::after{content:"–"}.cat.closed .cat-toggle .pm::after{content:"+"}.cat.closed h3{border-bottom:0}.cat.closed ul,.cat.closed .note{display:none}.cat{margin-bottom:14px}#events .ev-poster{display:none}}
+@media(max-width:600px){.cat-toggle{cursor:pointer}.cat-toggle .pm{display:inline-block;font:700 26px/1 "Space Mono",monospace;flex:none;width:1ch;text-align:center}.cat-toggle .pm::after{content:"–"}.cat.closed .cat-toggle .pm::after{content:"+"}.cat.closed h3{border-bottom:0}.cat.closed ul,.cat.closed .note{display:none}.cat{margin-bottom:14px}#events .ev-poster{display:none}#events .ev-poster.solo{display:block;width:min(80%,320px)}}
+@media(max-width:800px){#events .events>*{order:2}#events .ev.has-poster{order:0}#events .ev-poster{order:1;margin-bottom:10px}}
 .it{display:grid;grid-template-columns:auto 1fr auto;gap:0 8px;align-items:baseline;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-radius:12px;padding:9px 12px}
 .it .nm{font:800 17px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.01em}
 .it i{border-bottom:2px dotted currentColor;opacity:.35;transform:translateY(-4px)}
@@ -132,3 +133,8 @@ input[type=email]{flex:1 1 220px;font-family:inherit;font-size:17px;padding:14px
 @media(max-width:600px){nav{padding:0 4vw}nav ul{gap:14px}nav .logo svg{height:32px}nav a[href='#reviews'],nav a[href='#events']{display:none}nav a.l{font-size:11px}.up-trigger{font-size:11px;padding:10px;gap:6px}.stair-icon{width:14px}.hero{min-height:max(620px,calc(100svh - var(--nav)));padding:20px 6vw}.hero-topline{font-size:11px}.hero-topline>span:last-child{max-width:115px;text-align:right}.hero-copy{padding:66px 0}.hero h1{font-size:16.5vw;line-height:.91;margin-bottom:34px}.hero-smile{width:.52em;height:.52em;margin-left:.1em}.hero-actions{gap:22px}.hero-primary{padding:18px 20px}.hero-secondary{font-size:11px}.hero-foot{font-size:11px}#menu{padding-top:52px;padding-bottom:52px}.site-footer{padding:48px 6vw 18px}.footer-main{grid-template-columns:1fr;gap:34px;padding-bottom:36px}.footer-brand{max-width:220px}.footer-main dl{max-width:300px}.footer-bottom{flex-wrap:wrap;gap:16px}.up-head{padding:16px 5vw}.up-head>.mono{font-size:11px}.up-head>.mono>span{padding:0 5px}.up-close{font-size:11px;gap:8px}.up-flight{width:84vw}.up-arrival h2{font-size:24vw}}
 @media(prefers-reduced-motion:reduce){.up-dialog.climbing .up-flight,.up-dialog.climbing .up-portal,.up-dialog.climbing .up-progress{animation:none}.up-stage{display:none}.up-arrival{transition:none}.hero-primary{transition:none}}
 
+
+/* a flyer with no typed shows sits inside its card */
+.ev.solo-flyer{display:grid;grid-template-columns:1fr minmax(170px,40%);column-gap:28px;align-items:start}.ev.solo-flyer>*{grid-column:1}.ev.solo-flyer>.ev-poster{grid-column:2;grid-row:1/span 6;margin:0;width:100%}.ev.solo-flyer>.ev-poster span{text-align:left}
+@media(max-width:600px){.ev.solo-flyer{display:flex}.ev.solo-flyer>.ev-poster,#events .ev-poster.in-card{display:block;width:min(100%,300px);margin-top:12px}}
+.ev.solo-flyer>.btn{justify-self:start}

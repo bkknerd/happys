@@ -20,6 +20,7 @@
 <link rel="preload" href="content/photos.json" as="fetch" crossorigin>
 <link rel="preload" href="content/events.json" as="fetch" crossorigin>
 <link rel="preload" href="content/reviews.json" as="fetch" crossorigin>
+<link rel="preload" href="content/flyers.json" as="fetch" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Hanken+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
@@ -132,7 +133,7 @@
 /* Everything on this page comes from the files in /content (edited at /admin). */
 (function(){
   var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)};
-  var FILES=['general','hours','menu','photos','events','reviews'];
+  var FILES=['general','hours','menu','photos','events','reviews','flyers'];
   var COLORS={yellow:'#f5c518',pink:'#f6a9d2',blue:'#5ba7e8',orange:'#f59a3d',lavender:'#d9b3ff',mint:'#8fd0c4'};
   var FILTERS=[['all','all'],['specials','specials'],['cocktails','cocktails'],['beer','beer'],['shots','shots'],['zero','zero proof'],['wine','wine'],['food','food']];
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -140,11 +141,13 @@
   function get(o,p){return p.split('.').reduce(function(a,k){return a==null?a:a[k]},o)}
   function col(c){return COLORS[c]||COLORS.yellow}
 
+  /* the CMS saves photos as /images/uploads/…; use them relative so the page works from any folder */
+  function rel(o){if(typeof o==='string')return o.replace(/^\/(images\/uploads\/)/,'$1');if(Array.isArray(o))return o.map(rel);if(o&&typeof o==='object'){var r={};for(var k in o)r[k]=rel(o[k]);return r}return o}
   var baked=document.getElementById('content-data');
   (baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
   Promise.all(FILES.map(function(f){return fetch('content/'+f+'.json').then(function(r){if(!r.ok)throw new Error(f+'.json '+r.status);return r.json()})})))
-  .then(function(parts){
-    var g=parts[0],C={hero:g.hero,contact:g.contact,newsletter:g.newsletter,walk_up:g.walk_up,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5]};
+  .then(function(parts){parts=rel(parts);
+    var g=parts[0],C={hero:g.hero,contact:g.contact,newsletter:g.newsletter,walk_up:g.walk_up,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5],flyers:(parts[6]||{}).flyers||[]};
     render(C);
   }).catch(function(e){console.error('content failed to load',e);document.documentElement.classList.add('no-content')});
 
@@ -167,7 +170,7 @@
     var up=$('#up-ig');up.href='https://www.instagram.com/'+C.walk_up.instagram+'/';up.textContent='@'+C.walk_up.instagram+' ↗';
 
     if(C.visit.image){var vp=$('#visit-photo');vp.hidden=false;vp.querySelector('img').src=C.visit.image;vp.querySelector('img').alt=C.visit.alt||'';vp.querySelector('figcaption').textContent=C.visit.caption||''}
-    menu(C.menu);photos(C.photos);events(C.events);reviews(C.reviews);hours(C.hours,C);
+    menu(C.menu);photos(C.photos);events(C.events,C.flyers);reviews(C.reviews);hours(C.hours,C);
     if(!window.__PRERENDER__)reveal();
   }
 
@@ -215,23 +218,44 @@
 
   /* events */
   var WD=['sun','mon','tue','wed','thu','fri','sat'];
+  /* which flyer to show: this month's, unless its shows are all done and next month's is up; otherwise the next one coming.
+     a flyer from a month that's over never shows. */
+  function iso(d){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+  function pickFlyer(list){
+    var today=iso(new Date()),mon=today.slice(0,7);
+    var fs=(list||[]).filter(function(f){return f&&f.image&&f.month}).map(function(f){return Object.assign({},f,{month:String(f.month).slice(0,7)})})
+      .filter(function(f){return f.month>=mon}).sort(function(a,b){return a.month<b.month?-1:1});
+    for(var i=0;i<fs.length;i++){
+      var sh=(fs[i].shows||[]).filter(function(r){return r&&r.date});
+      var done=sh.length&&sh.every(function(r){return String(r.date).slice(0,10)<today});
+      if(!done||i===fs.length-1)return fs[i];
+    }
+    return null;
+  }
+  function when(f){if(!f||!f.starts)return '';var a=clean(f.starts),b=clean(f.ends);if(!b)return a;var m=a.slice(-2);return (m===b.slice(-2)?a.slice(0,-2):a)+'–'+b}
   function lineup(x){
     var rows=(x.lineup||[]).filter(function(r){return r&&r.date&&r.artist});
-    if(!rows.length)return '';
+    var head=(x.lineup_title||x.when)?'<p class="lineup-title mono">'+esc(x.lineup_title||'')+(x.lineup_title&&x.when?' · ':'')+(x.when?'<span style="white-space:nowrap">'+esc(x.when)+'</span>':'')+'</p>':'';
+    if(!rows.length)return head;
     var t=new Date();t.setHours(0,0,0,0);var nextDone=false;
     rows.sort(function(a,b){return a.date<b.date?-1:1});
-    return (x.lineup_title?'<p class="lineup-title mono">'+esc(x.lineup_title)+'</p>':'')+'<ul class="lineup">'+rows.map(function(r){
+    return head+'<ul class="lineup">'+rows.map(function(r){
       var p=String(r.date).slice(0,10).split('-'),d=new Date(+p[0],p[1]-1,+p[2]),past=d<t,cls=past?'past':(!nextDone?(nextDone=true,'next'):'');
       return '<li'+(cls?' class="'+cls+'"':'')+'><time class="mono" datetime="'+esc(r.date)+'">'+WD[d.getDay()]+' '+p[1]+'.'+p[2]+'</time><b>'+esc(r.artist)+'</b>'+(r.genre?'<small class="mono">'+esc(r.genre)+'</small>':'')+'</li>'}).join('')+'</ul>';
   }
-  function events(e){
-    var posters=(e.items||[]).filter(function(x){return x.poster}).map(function(x){
-      return '<a class="ev-poster rv" href="'+esc(x.poster)+'" target="_blank" rel="noopener"><img src="'+esc(x.poster)+'" alt="'+esc((x.lineup_title||x.title)+' poster')+'" width="760" height="982" loading="lazy" decoding="async"><span class="mono">'+esc(x.lineup_title||'the poster')+', full size ↗</span></a>'}).join('');
+  function events(e,flyers){
+    var fl=pickFlyer(flyers);
+    e=Object.assign({},e,{items:(e.items||[]).map(function(x){
+      if(!x.show_flyer||!fl)return x;
+      return Object.assign({},x,{lineup:fl.shows||[],lineup_title:fl.title,poster:fl.image,when:when(fl),solo:!(fl.shows||[]).some(function(r){return r&&r.date&&r.artist})});
+    })});
+    function poster(x,cls){return '<a class="ev-poster'+cls+'" href="'+esc(x.poster)+'" target="_blank" rel="noopener"><img src="'+esc(x.poster)+'" alt="'+esc((x.lineup_title||x.title)+' poster')+'" width="760" height="982" loading="lazy" decoding="async"><span class="mono">'+esc(x.lineup_title||'the poster')+', full size ↗</span></a>'}
+    var posters=(e.items||[]).filter(function(x){return x.poster&&!x.solo}).map(function(x){return poster(x,' rv')}).join('');
     $('#events-list').innerHTML=(e.items||[]).map(function(x){
       var ext=/^https?:/.test(x.button_link);
       var L=lineup(x);
-      return '<article class="ev rv'+(L?' has-lineup':'')+'" style="--c:'+col(x.color)+'">'+(x.label?'<p class="mono">'+esc(x.label)+'</p>':'')+'<h3>'+esc(x.title)+'</h3>'+(x.body?'<p>'+br(x.body)+'</p>':'')+L+
-        (x.button_text&&x.button_link?'<a class="btn" href="'+esc(x.button_link)+'"'+(ext?' target="_blank" rel="noopener"':'')+'>'+esc(x.button_text)+'</a>':'')+'</article>'}).join('')+posters;
+      return '<article class="ev rv'+(L.indexOf('<ul')>-1?' has-lineup':'')+(x.poster&&!x.solo?' has-poster':'')+(x.solo?' solo-flyer':'')+'" style="--c:'+col(x.color)+'">'+(x.label?'<p class="mono">'+esc(x.label)+'</p>':'')+'<h3>'+esc(x.title)+'</h3>'+(x.body?'<p>'+br(x.body)+'</p>':'')+L+
+        (x.button_text&&x.button_link?'<a class="btn" href="'+esc(x.button_link)+'"'+(ext?' target="_blank" rel="noopener"':'')+'>'+esc(x.button_text)+'</a>':'')+(x.solo?poster(x,' in-card'):'')+'</article>'}).join('')+posters;
     if(!(e.items||[]).length){$('#events').hidden=true;$$('nav a[href="#events"]').forEach(function(a){a.parentNode.hidden=true})}
   }
 
@@ -283,7 +307,9 @@
       acceptsReservations:false,sameAs:['https://www.instagram.com/'+ct.instagram+'/'],
       openingHoursSpecification:Object.keys(by).map(function(d){var o=hrs(by[d].open),c=hrs(by[d].close,true);return {"@type":"OpeningHoursSpecification",dayOfWeek:"https://schema.org/"+cap(DL[d]),opens:hm(o||0),closes:hm(c||24)}})};
     var t0=new Date().toISOString().slice(0,10),evs=[];
-    ((C.events||{}).items||[]).forEach(function(x){(x.lineup||[]).forEach(function(r){if(r&&r.artist&&r.date&&String(r.date).slice(0,10)>=t0)evs.push({"@type":"MusicEvent",name:r.artist+' at happy’s',startDate:String(r.date).slice(0,10),eventAttendanceMode:"https://schema.org/OfflineEventAttendanceMode",eventStatus:"https://schema.org/EventScheduled",location:{"@type":"BarOrPub",name:"happy’s",address:ld.address},performer:{"@type":"PerformingGroup",name:r.artist}})})});
+    function off(day){try{var z=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',timeZoneName:'longOffset'}).formatToParts(new Date(day+'T12:00:00Z')).filter(function(p){return p.type==='timeZoneName'})[0].value.replace('GMT','');return z||'+00:00'}catch(e){return ''}}
+    function at(day,t,closing){var h=hrs(t,closing);if(h==null)return day;var d=day;if(h>=24){h-=24;var n=new Date(day+'T12:00:00Z');n.setUTCDate(n.getUTCDate()+1);d=n.toISOString().slice(0,10)}return d+'T'+hm(h)+':00'+off(day)}
+    (C.flyers||[]).forEach(function(f){(f.shows||[]).forEach(function(r){if(r&&r.artist&&r.date&&String(r.date).slice(0,10)>=t0){var day=String(r.date).slice(0,10),o={"@type":"MusicEvent",name:r.artist+' at happy’s',startDate:at(day,f.starts),eventAttendanceMode:"https://schema.org/OfflineEventAttendanceMode",eventStatus:"https://schema.org/EventScheduled",location:{"@type":"BarOrPub",name:"happy’s",address:ld.address},performer:{"@type":"PerformingGroup",name:r.artist}};if(f.ends&&hrs(f.ends)!=null)o.endDate=at(day,f.ends,true);if(f.image)o.image=new URL(f.image,location.href).href;evs.push(o)}})});
     if(evs.length)ld.event=evs;
     var old=document.getElementById('ld');if(old)old.remove();
     var sc=document.createElement('script');sc.id='ld';sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc);

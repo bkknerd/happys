@@ -1,0 +1,67 @@
+{
+  "flyers": [
+    {
+      "month": "2026-11",
+      "title": "november music",
+      "image": "images/uploads/november-music.webp",
+      "starts": "7pm",
+      "ends": "10pm",
+      "shows": [
+        {
+          "date": "2026-11-07",
+          "artist": "My Cousin Skinny",
+          "genre": "classic/pop hits"
+        },
+        {
+          "date": "2026-11-14",
+          "artist": "Phil + Tim Duo",
+          "genre": "party hits"
+        },
+        {
+          "date": "2026-11-21",
+          "artist": "Helena Redman Duo",
+          "genre": "pop/rock hits"
+        },
+        {
+          "date": "2026-11-28",
+          "artist": "Joey Calderaio",
+          "genre": "pop/variety"
+        }
+      ]
+    },
+    {
+      "month": "2026-10",
+      "title": "october music",
+      "image": "images/uploads/october-music.webp",
+      "starts": "7pm",
+      "ends": "10pm",
+      "shows": [
+        {
+          "date": "2026-10-03",
+          "genre": "classic hits",
+          "artist": "Steve Holcomb"
+        },
+        {
+          "date": "2026-10-10",
+          "genre": "pop/rock hits",
+          "artist": "Matt from Boston"
+        },
+        {
+          "date": "2026-10-17",
+          "genre": "pop/rock hits",
+          "artist": "Shane Bullis"
+        },
+        {
+          "date": "2026-10-24",
+          "genre": "newgrass/pop hits",
+          "artist": "Brian & Cheyenne"
+        },
+        {
+          "date": "2026-10-31",
+          "genre": "pop/rock hits",
+          "artist": "Chris Overstreet"
+        }
+      ]
+    }
+  ]
+}

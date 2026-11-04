@@ -19,7 +19,7 @@ for (const name of await readdir(root)) {
 }
 
 const PAGES = [
-  { file: 'index.html', content: ['general', 'hours', 'menu', 'photos', 'events', 'reviews'], check: (d) => d.querySelectorAll('#menugrid .cat').length },
+  { file: 'index.html', content: ['general', 'hours', 'menu', 'photos', 'events', 'reviews', 'flyers'], check: (d) => d.querySelectorAll('#menugrid .cat').length },
   { file: 'events.html', content: ['private-events', 'general'], check: (d) => d.querySelectorAll('#pe-crit li').length && d.querySelector('form[name="event-inquiry"]') ? 1 : 0 },
 ];
 

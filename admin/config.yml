@@ -16,7 +16,7 @@ display_url: https://happysnc.com
 logo_url: /images/uploads/hero-smiley-wall.webp
 
 media_folder: images/uploads
-public_folder: images/uploads
+public_folder: /images/uploads
 
 collections:
   - name: site
@@ -68,12 +68,12 @@ collections:
                   - { label: zero proof, value: zero }
                   - { label: wine, value: wine }
                   - { label: food, value: food }
-              - { label: Price next to the title (optional), name: price_tag, widget: string, required: false, hint: "For sections where everything costs the same, like 5" }
+              - { label: Price next to the title, name: price_tag, widget: string, required: false, hint: "For sections where everything costs the same, like 5" }
               - label: Color
                 name: color
                 widget: select
                 options: [yellow, pink, blue, orange, lavender, mint]
-              - { label: Highlighted note (optional), name: note, widget: string, required: false, hint: "Shows in a yellow band under the title, like: make it a pitcher! 18" }
+              - { label: Highlighted note, name: note, widget: string, required: false, hint: "Shows in a yellow band under the title, like: make it a pitcher! 18" }
               - label: Items
                 name: items
                 widget: list
@@ -81,7 +81,7 @@ collections:
                 fields:
                   - { label: Name, name: name, widget: string }
                   - { label: Price, name: price, widget: string, required: false, hint: "Just the number, like 10. Leave blank if it's covered by the section." }
-                  - { label: Description (optional), name: description, widget: string, required: false }
+                  - { label: Description, name: description, widget: string, required: false }
 
       # ───────────────────────── EVENTS
       - name: events
@@ -99,21 +99,40 @@ collections:
               - { label: Small label, name: label, widget: string, required: false, hint: "Like: every saturday" }
               - { label: Title, name: title, widget: string }
               - { label: Text, name: body, widget: text, required: false }
-              - { label: Lineup heading (optional), name: lineup_title, widget: string, required: false, hint: "Like: november music" }
-              - label: Lineup (optional)
-                name: lineup
+              - { label: Show this month's music flyer on this card, name: show_flyer, widget: boolean, default: false, required: false, hint: "Turn on for the live music card. The flyer and its shows come from Music flyers." }
+              - { label: Button text, name: button_text, widget: string, required: false }
+              - { label: Button link, name: button_link, widget: string, required: false, hint: "A web address, or mailto:someone@email.com" }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+
+      # ───────────────────────── MUSIC FLYERS
+      - name: flyers
+        label: Music flyers
+        file: content/flyers.json
+        format: json
+        fields:
+          - label: Flyers
+            name: flyers
+            widget: list
+            label_singular: flyer
+            summary: "{{fields.title}} ({{fields.month}})"
+            hint: "Add next month's flyer any time. The site shows this month's flyer, switches to the next one once this month's shows are done, and never shows an old month."
+            fields:
+              - { label: Month, name: month, widget: datetime, format: "YYYY-MM", date_format: "MMMM YYYY", time_format: false, picker_utc: true, hint: "Pick any day in the month the flyer is for." }
+              - { label: Flyer, name: image, widget: image, choose_url: false, hint: "The same image you post on Instagram." }
+              - { label: Heading, name: title, widget: string, hint: "Like: november music" }
+              - { label: Music starts, name: starts, widget: string, default: "7pm", pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 7pm or 7:30pm'] }
+              - { label: Music ends, name: ends, widget: string, default: "10pm", required: false, pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 10pm'] }
+              - label: Shows
+                name: shows
                 widget: list
+                label_singular: show
                 required: false
                 summary: "{{fields.date}} · {{fields.artist}}"
-                hint: One row per show. Past dates get crossed out on their own, and the next show is marked.
+                hint: "Optional. With just the flyer, the flyer shows on its own. Type the shows too and they list on the page, past ones cross out, the next one is marked, and Google can list them as events."
                 fields:
                   - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "MMM D, YYYY", time_format: false, picker_utc: true }
                   - { label: Who's playing, name: artist, widget: string }
                   - { label: Style, name: genre, widget: string, required: false, hint: "Like: pop/rock hits" }
-              - { label: Poster (optional), name: poster, widget: image, required: false, choose_url: false, hint: "The month's flyer. Shows as a small tilted thumbnail that opens full size." }
-              - { label: Button text, name: button_text, widget: string, required: false }
-              - { label: Button link, name: button_link, widget: string, required: false, hint: "A web address, or mailto:someone@email.com" }
-              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
 
       # ───────────────────────── PRIVATE EVENTS PAGE (events.html)
       - name: private_events

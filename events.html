@@ -200,10 +200,12 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function br(s){return esc(s).replace(/\n/g,'<br>')}
   function get(o,p){return p.split('.').reduce(function(a,k){return a==null?a:a[k]},o)}
+  /* the CMS saves photos as /images/uploads/…; use them relative so the page works from any folder */
+  function rel(o){if(typeof o==='string')return o.replace(/^\/(images\/uploads\/)/,'$1');if(Array.isArray(o))return o.map(rel);if(o&&typeof o==='object'){var r={};for(var k in o)r[k]=rel(o[k]);return r}return o}
   var baked=document.getElementById('content-data');
   (baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
    Promise.all(FILES.map(function(f){return fetch('content/'+f+'.json').then(function(r){if(!r.ok)throw new Error(f);return r.json()})})))
-  .then(function(p){render(p[0],p[1])})
+  .then(function(p){p=rel(p);render(p[0],p[1])})
   .catch(function(e){console.error('content failed to load',e)});
 
   function render(E,G){

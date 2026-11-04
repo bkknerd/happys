@@ -11,7 +11,8 @@ content/            everything the owner can change
   hours.json        open days and times
   menu.json         menu sections and items
   photos.json       the "lately at happy's" strip
-  events.json       event cards, the monthly music lineup and poster
+  events.json       event cards
+  flyers.json       monthly music flyers and their shows
   private-events.json  the private events page: photos, criteria, steps, form text
   reviews.json      rating, tags, quotes
 images/uploads/     photos (new uploads from the CMS land here too)
@@ -87,7 +88,7 @@ The build fails on purpose if a content file is broken or the menu renders empty
 
 - **Phones:** menu sections fold up on screens 600px wide or less. The first section starts open, and searching or tapping a filter opens whatever matches. The poster is hidden on phones because the lineup already lists the same shows.
 - **Hours:** list only the days you're open; any day left out shows as "closed". Write times like `4pm`, `12am` or `11:30pm`. The week, the footer, today's highlight and the Google schema all come from this one list.
-- **Music lineup:** each month, go to Events → live music, replace the rows and upload the new poster. Past dates cross themselves out and the next show is marked. Upcoming shows also go into the page's search data as events.
+- **Music flyers:** in the CMS, open **Music flyers → Add flyer**, pick the month, upload the flyer and save. That's all it needs; the live music card shows it. Typing the shows in is optional: with them, the shows list as text, past dates cross out, the next one is marked, and each show (with its start and end time) goes into Google's event data. Add next month's flyer whenever it's ready. The site shows this month's flyer, switches to the next once this month's shows are done, and never shows a month that's over.
 - **Colors** are picked by name (yellow, pink, blue, orange, lavender, mint), so cards always stay on-brand.
 - **Photos:** square, at least 900px wide. Five fills the row.
 - **Events:** delete every card and the section and its nav link disappear.
