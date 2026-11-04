@@ -54,7 +54,7 @@
   <div class="hero-photo" aria-hidden="true"></div><div class="hero-shade" aria-hidden="true"></div>
   <div class="hero-topline mono"><span><span data-t="hero.topline_left"></span><span class="xs-hide"> <span data-t="hero.topline_left_extra"></span></span></span><span><span class="m-hide"><span data-t="hero.topline_right_extra"></span> </span><span data-t="hero.topline_right"></span></span></div>
   <div class="hero-copy">
-    <h1><span class="sr">happy’s, a cocktail bar in <span data-t="contact.city"></span>, <span data-t="contact.state"></span>. </span><span data-t="hero.line_1"></span><br><span class="hero-last"><span data-t="hero.line_2"></span><span class="hero-period">.</span><svg class="hero-smile" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#f5c518"/><ellipse cx="35" cy="39" rx="5" ry="8" fill="#1d1410"/><ellipse cx="65" cy="39" rx="5" ry="8" fill="#1d1410"/><path d="M25 58 Q50 87 75 58" fill="none" stroke="#1d1410" stroke-width="5" stroke-linecap="round"/></svg></span></h1>
+    <h1><span class="sr">happy’s, a cocktail bar in <span data-t="contact.city"></span>, <span data-t="contact.state"></span>. </span><span data-t="hero.line_1"></span><br><span class="hero-last"><span data-t="hero.line_2"></span><span class="hero-period">.</span><svg class="hero-smile" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#f5c518"/><ellipse cx="35" cy="39" rx="5" ry="8" fill="#1d1410"/><ellipse class="eye-r" cx="65" cy="39" rx="5" ry="8" fill="#1d1410"/><path class="lid" d="M57 41 Q65 32 73 41" fill="none" stroke="#1d1410" stroke-width="4.5" stroke-linecap="round"/><path class="mouth" d="M25 58 Q50 87 75 58" fill="none" stroke="#1d1410" stroke-width="5" stroke-linecap="round"/></svg></span></h1>
     <div class="hero-actions"><a class="hero-primary" href="#menu"><span data-t="hero.menu_button"></span> ↗</a><a class="hero-secondary" href="#visit"><span data-t="hero.visit_button"></span> ↗</a></div>
   </div>
   <div class="hero-foot mono"><span id="hero-addr"></span><a href="#menu">menu ↓</a></div>
@@ -339,6 +339,15 @@
       c.style.setProperty('--x',(Math.random()*80-40)+'vw');c.style.setProperty('--y',(Math.random()*-60-10)+'vh');c.style.setProperty('--r',(Math.random()*720-360)+'deg');
       document.body.appendChild(c);setTimeout(function(n){return function(){n.remove()}}(c),1300);
     }
+  }
+
+  /* the hero smiley winks: once after the headline lands, then on hover or tap of the headline */
+  var smile=$('.hero-smile');
+  if(smile&&!window.__PRERENDER__&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
+    var wink=function(){if(smile.classList.contains('wink'))return;smile.classList.add('wink')};
+    smile.addEventListener('animationend',function(e){if(e.animationName==='smile-tilt')smile.classList.remove('wink')});
+    setTimeout(wink,1100);
+    var h1=smile.closest('h1');if(h1){h1.addEventListener('mouseenter',wink);h1.addEventListener('click',wink)}
   }
 
   /* smiley cursor (mouse only) */
