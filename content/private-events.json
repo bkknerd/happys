@@ -1,0 +1,88 @@
+{
+  "eyebrow": "private events · downtown cary",
+  "heading": "throw it\nat happy’s.",
+  "intro": "birthdays, work nights, showers, watch parties. bring your people downstairs at 126 w chatham and we’ll take care of the drinks.",
+  "hero_image": "images/uploads/sticker-wall-table.webp",
+  "hero_alt": "A high-top table and black stools in front of the smiley sticker wall, a TV above it",
+  "space_heading": "the space",
+  "space_note": "a ground-floor bar on chatham street, a wall covered in smiley stickers, tvs for the game, and a patio out front.",
+  "photos": [
+    {
+      "image": "images/uploads/hero-smiley-wall.webp",
+      "caption": "the sticker wall",
+      "alt": "Close-up of the wall covered in colorful smiley-face stickers"
+    },
+    {
+      "image": "images/uploads/espresso-martini.webp",
+      "caption": "the bar",
+      "alt": "An espresso martini on a table inside happy’s, string lights and the bar behind it"
+    },
+    {
+      "image": "images/uploads/crush-cups.webp",
+      "caption": "drinks by the wall",
+      "alt": "Two crush cocktails in front of the smiley-sticker wall"
+    },
+    {
+      "image": "images/uploads/personal-pizza.webp",
+      "caption": "the patio",
+      "alt": "A personal pepperoni pizza on a patio table outside"
+    },
+    {
+      "image": "images/uploads/storefront.webp",
+      "caption": "the front door",
+      "alt": "The white brick front of happy’s with its black door on West Chatham Street"
+    }
+  ],
+  "criteria_heading": "what works here",
+  "criteria": [
+    {
+      "title": "everyone’s 21+",
+      "body": "every guest, guest of honor included. bring your id.",
+      "color": "yellow"
+    },
+    {
+      "title": "thursday to sunday",
+      "body": "events happen on the days we’re open. give us a backup date too, just in case.",
+      "color": "pink"
+    },
+    {
+      "title": "saturdays come with a band",
+      "body": "there’s live music every saturday. want a saturday? say so on the form and we’ll talk it through.",
+      "color": "blue"
+    },
+    {
+      "title": "the earlier, the better",
+      "body": "dates go fast, especially around the holidays. a few weeks out gives everyone room to plan.",
+      "color": "orange"
+    },
+    {
+      "title": "good fits",
+      "body": "birthdays, work nights, showers, watch parties, small fundraisers, the after-party. if it’s a feel-good thing, it probably fits.",
+      "color": "lavender"
+    },
+    {
+      "title": "snacks, sorted",
+      "body": "pizza, hot dogs, charcuterie trays and the rest of the snack menu can come out with the drinks. tell us roughly how many are eating.",
+      "color": "mint"
+    }
+  ],
+  "steps_heading": "how it works",
+  "steps": [
+    {
+      "title": "tell us about it",
+      "body": "fill out the form below. it takes about two minutes."
+    },
+    {
+      "title": "we email you back",
+      "body": "we’ll talk through the date, the headcount, drinks and food."
+    },
+    {
+      "title": "lock it in",
+      "body": "once the details are agreed, the date is yours."
+    }
+  ],
+  "form_heading": "ask about a date",
+  "form_intro": "no commitment yet. this just starts the conversation.",
+  "thanks_heading": "got it. thank you!",
+  "thanks_body": "we’ll email you back about your date. didn’t that feel good?"
+}

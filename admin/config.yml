@@ -115,6 +115,51 @@ collections:
               - { label: Button link, name: button_link, widget: string, required: false, hint: "A web address, or mailto:someone@email.com" }
               - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
 
+      # ───────────────────────── PRIVATE EVENTS PAGE (events.html)
+      - name: private_events
+        label: Private events page
+        file: content/private-events.json
+        format: json
+        fields:
+          - { label: Small label at the top, name: eyebrow, widget: string }
+          - { label: Headline, name: heading, widget: text, hint: "A line break here shows as a line break on the page." }
+          - { label: Intro, name: intro, widget: text }
+          - { label: Top photo, name: hero_image, widget: image, choose_url: false }
+          - { label: Top photo description (for screen readers), name: hero_alt, widget: string }
+          - { label: Space heading, name: space_heading, widget: string }
+          - { label: Space note, name: space_note, widget: text }
+          - label: Photos of the space
+            name: photos
+            widget: list
+            summary: "{{fields.caption}}"
+            hint: Five fills the grid. The first one shows biggest.
+            fields:
+              - { label: Photo, name: image, widget: image, choose_url: false }
+              - { label: Caption, name: caption, widget: string }
+              - { label: Description for screen readers, name: alt, widget: string }
+          - { label: Criteria heading, name: criteria_heading, widget: string }
+          - label: Criteria
+            name: criteria
+            widget: list
+            summary: "{{fields.title}}"
+            hint: What makes a good event here. Six fills the grid.
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: body, widget: text }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+          - { label: Steps heading, name: steps_heading, widget: string }
+          - label: Steps
+            name: steps
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: body, widget: text }
+          - { label: Form heading, name: form_heading, widget: string }
+          - { label: Text next to the form, name: form_intro, widget: text }
+          - { label: Thank-you heading, name: thanks_heading, widget: string }
+          - { label: Thank-you text, name: thanks_body, widget: text }
+
       # ───────────────────────── PHOTOS
       - name: photos
         label: Photos

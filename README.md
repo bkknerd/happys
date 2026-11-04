@@ -3,13 +3,16 @@
 Every word, price, hour and photo lives in `content/*.json`, and the owner edits those through Decap CMS at `/admin`. On each deploy, Netlify runs a small build that bakes that content into the page, so visitors and search engines get the full menu, hours, lineup and schema in the first response, with no loading step.
 
 ```
-index.html          the page (design + code, rarely touched)
+index.html          the home page (design + code, rarely touched)
+events.html         the private events page: the space, what works here, inquiry form
+css/site.css        styles shared by both pages
 content/            everything the owner can change
   general.json      contact, top of the page, storefront photo, email signup, the walk up, footer
   hours.json        open days and times
   menu.json         menu sections and items
   photos.json       the "lately at happy's" strip
   events.json       event cards, the monthly music lineup and poster
+  private-events.json  the private events page: photos, criteria, steps, form text
   reviews.json      rating, tags, quotes
 images/uploads/     photos (new uploads from the CMS land here too)
 admin/              the CMS (index.html + config.yml)
@@ -42,7 +45,7 @@ Open `admin/config.yml` and change `repo: OWNER/happys-site` to your real `user/
 
 ### 4. Turn on the email signup
 - In Netlify, open **Forms** and click **Enable form detection**. Then trigger one more deploy (Deploys → Trigger deploy) so Netlify picks up the `newsletter` form.
-- Under **Forms → Form notifications**, add an email notification to the owner's address. Without one, signups only pile up in the Netlify dashboard.
+- The site has two forms: `newsletter` (email signup) and `event-inquiry` (the private events form). Under **Forms → Form notifications**, add an email notification to the owner's address for each, at least for `event-inquiry`. Without one, submissions only pile up in the Netlify dashboard.
 - Spam is filtered with a hidden honeypot field.
 
 ### 5. CMS sign-in
@@ -91,3 +94,5 @@ The build fails on purpose if a content file is broken or the menu renders empty
 - **Search tags** (`<title>`, description, share tags) live in the `<head>` of `index.html`, not in the CMS, so link previews work even for crawlers that don't run JavaScript.
 - **Decap version** is pinned to 3.17.3 in `admin/index.html`. Bump it on purpose, not by accident.
 - **Why not Git Gateway / Netlify Identity:** Netlify Identity is supported again (Feb 2026), but Git Gateway, the piece Decap needs to use it, is still deprecated. The GitHub backend avoids it. The trade-off is that each editor needs a GitHub account.
+
+- **Private events page** (`events.html`): photos, criteria, steps and form text are all under **Private events page** in the CMS. The form's fields themselves are in `events.html`. Capacity, deposits and minimums are deliberately left off until the owner confirms them.

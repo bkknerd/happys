@@ -41,9 +41,9 @@
     {
       "label": "birthdays · work nights",
       "title": "book the bar",
-      "body": "throw your thing at happy’s. tell us the date, how many people, and what you have in mind.",
-      "button_text": "ask about a date",
-      "button_link": "mailto:thewalkupcary@gmail.com?subject=Private%20event%20at%20happy%E2%80%99s&body=Date%3A%0AHow%20many%20people%3A%0AWhat%20you%20have%20in%20mind%3A",
+      "body": "throw your thing at happy’s. see the space, what works here, and ask about a date.",
+      "button_text": "plan an event →",
+      "button_link": "events.html",
       "color": "pink"
     }
   ]
