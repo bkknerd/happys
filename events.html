@@ -99,7 +99,6 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
     <li><a class="l mono" href="./#menu">menu</a></li>
     <li><a class="l mono" href="events.html" aria-current="page">events</a></li>
     <li><a class="l mono" href="./#visit">visit</a></li>
-    <li><a class="up-trigger mono" id="up-trigger" href="https://the-walkup.netlify.app/" aria-label="the walk up, our upstairs cocktail bar (opens its site)"><span class="stair-icon" aria-hidden="true"><i></i><i></i><i></i></span>the walk up <span class="arr" aria-hidden="true">↗</span></a></li>
   </ul>
 </nav>
 
@@ -215,7 +214,6 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
     $$('[data-mail]').forEach(function(a){a.href='mailto:'+ct.email});
     $$('[data-ig]').forEach(function(a){a.href='https://www.instagram.com/'+ct.instagram+'/'});
     $('#foot-addr').innerHTML=esc(ct.street)+(ct.address_note?'<br>'+esc(ct.address_note):'')+'<br>'+esc(ct.city+', '+ct.state+' '+ct.zip);
-    if(G.walk_up&&G.walk_up.url)$('#up-trigger').href=G.walk_up.url;
     var hi=$('#pe-hero-img');if(E.hero_image){hi.src=E.hero_image;hi.alt=E.hero_alt||''}else hi.parentNode.hidden=true;
     $('#pe-photos').innerHTML=(E.photos||[]).map(function(x,i){
       return '<li><figure><img src="'+esc(x.image)+'" alt="'+esc(x.alt||x.caption)+'" width="900" height="900"'+(i?' loading="lazy"':'')+' decoding="async"><figcaption class="mono">'+esc(x.caption)+'</figcaption></figure></li>'}).join('');

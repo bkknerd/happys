@@ -7,7 +7,7 @@ index.html          the home page (design + code, rarely touched)
 events.html         the private events page: the space, what works here, inquiry form
 css/site.css        styles shared by both pages
 content/            everything the owner can change
-  general.json      contact, top of the page, storefront photo, email signup, the walk up, footer
+  general.json      contact, top of the page, storefront photo, email signup, footer
   hours.json        open days and times
   menu.json         menu sections and items
   photos.json       the "lately at happy's" strip

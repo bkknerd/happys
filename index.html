@@ -46,7 +46,6 @@
     <li><a class="l mono" href="#events">events</a></li>
     <li><a class="l mono" href="#reviews">reviews</a></li>
     <li><a class="l mono" href="#visit">visit</a></li>
-    <li><a class="up-trigger mono" id="up-trigger" href="https://the-walkup.netlify.app/" aria-label="the walk up, our upstairs cocktail bar (opens its site)"><span class="stair-icon" aria-hidden="true"><i></i><i></i><i></i></span>the walk up <span class="arr" aria-hidden="true">↗</span></a></li>
   </ul>
 </nav>
 
@@ -127,7 +126,6 @@
   <div class="footer-bottom"><small>© happy’s</small><span data-t="footer.note"></span><a class="credit" href="https://draftandlogic.com" target="_blank" rel="noopener">site by Draft and Logic ↗</a><a href="#top">back to top ↑</a></div>
 </footer>
 
-<dialog id="upstairs" class="up-dialog" aria-labelledby="up-title"><div class="up-shell"><div class="up-head"><span class="mono">happy’s <span aria-hidden="true">/</span> the walk up</span><button class="up-close mono" type="button" autofocus>back downstairs <span aria-hidden="true">↙</span></button></div><div class="up-stage" aria-hidden="true"><div class="up-portal"></div><div class="up-scene"><div class="up-flight"><div class="up-step" style="--i:0"><span>01</span></div><div class="up-step" style="--i:1"><span>02</span></div><div class="up-step" style="--i:2"><span>03</span></div><div class="up-step" style="--i:3"><span>04</span></div><div class="up-step" style="--i:4"><span>05</span></div><div class="up-step" style="--i:5"><span>06</span></div><div class="up-step" style="--i:6"><span>07</span></div><div class="up-step" style="--i:7"><span>08</span></div><div class="up-step" style="--i:8"><span>09</span></div><div class="up-step" style="--i:9"><span>10</span></div><div class="up-step" style="--i:10"><span>11</span></div><div class="up-step" style="--i:11"><span>12</span></div></div><div class="up-rail left"></div><div class="up-rail right"></div></div></div><div class="up-arrival"><p class="mono" data-t="walk_up.eyebrow"></p><h2 id="up-title">the<br>walk up<span>.</span></h2><p class="up-desc" data-t="walk_up.description"></p><div class="up-links mono"><a id="up-go" href="https://the-walkup.netlify.app/">go to the walk up ↗</a><a id="up-ig" href="#" target="_blank" rel="noopener"></a><a data-tel href="#"><span data-t="contact.phone"></span></a><a data-maps href="#" target="_blank" rel="noopener">directions ↗</a></div><button class="up-return" type="button">back to happy’s <span aria-hidden="true">↙</span></button></div><div class="up-caption mono" role="status" aria-live="polite">heading upstairs</div><div class="up-progress" aria-hidden="true"></div></div></dialog>
 
 <script>
 /* Everything on this page comes from the files in /content (edited at /admin). */
@@ -147,7 +145,7 @@
   (baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
   Promise.all(FILES.map(function(f){return fetch('content/'+f+'.json').then(function(r){if(!r.ok)throw new Error(f+'.json '+r.status);return r.json()})})))
   .then(function(parts){parts=rel(parts);
-    var g=parts[0],C={hero:g.hero,contact:g.contact,newsletter:g.newsletter,walk_up:g.walk_up,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5],flyers:(parts[6]||{}).flyers||[]};
+    var g=parts[0],C={hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5],flyers:(parts[6]||{}).flyers||[]};
     render(C);
   }).catch(function(e){console.error('content failed to load',e);document.documentElement.classList.add('no-content')});
 
@@ -166,8 +164,6 @@
     $('#hero-addr').textContent=street+' · '+ct.city.toLowerCase()+' '+ct.state.toLowerCase();
     $('#visit-addr').innerHTML=esc(ct.street.toLowerCase())+(ct.address_note?'<br>'+esc(ct.address_note.toLowerCase()):'')+'<br>'+esc((ct.city+', '+ct.state+' '+ct.zip).toLowerCase());
     $('#foot-addr').innerHTML=esc(ct.street)+(ct.address_note?'<br>'+esc(ct.address_note):'')+'<br>'+esc(ct.city+', '+ct.state+' '+ct.zip);
-    if(C.walk_up.url){$('#up-trigger').href=C.walk_up.url;$('#up-go').href=C.walk_up.url}
-    var up=$('#up-ig');up.href='https://www.instagram.com/'+C.walk_up.instagram+'/';up.textContent='@'+C.walk_up.instagram+' ↗';
 
     if(C.visit.image){var vp=$('#visit-photo');vp.hidden=false;vp.querySelector('img').src=C.visit.image;vp.querySelector('img').alt=C.visit.alt||'';vp.querySelector('figcaption').textContent=C.visit.caption||''}
     menu(C.menu);photos(C.photos);events(C.events,C.flyers);reviews(C.reviews);hours(C.hours,C);
@@ -359,24 +355,6 @@
     document.addEventListener('mouseup',function(){cur.classList.remove('dn')});
     (function loop(){cx+=(tx-cx)*.18;cy+=(ty-cy)*.18;cur.style.transform='translate('+cx+'px,'+cy+'px)';requestAnimationFrame(loop)})();
   }
-
-  /* the walk up */
-  var trigger=$('#up-trigger'),dialog=$('#upstairs'),caption=dialog.querySelector('.up-caption'),timer,oldOverflow;
-  function close(){clearTimeout(timer);dialog.close()}
-  /* the stairs end at the walk up's own site */
-  function go(){caption.textContent='opening the walk up';location.assign(trigger.href)}
-  trigger.addEventListener('click',function(e){
-    if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return; /* let new-tab clicks through */
-    e.preventDefault();
-    oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.classList.remove('climbing','arrived');caption.textContent='heading upstairs';dialog.showModal();
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){dialog.classList.add('arrived');timer=setTimeout(go,500);return}
-    void dialog.offsetWidth;dialog.classList.add('climbing');
-    timer=setTimeout(function(){dialog.classList.add('arrived');caption.textContent='the walk up — upstairs';timer=setTimeout(go,1100)},2800);
-  });
-  /* coming back with the browser's back button: start downstairs again */
-  window.addEventListener('pageshow',function(e){if(e.persisted&&dialog.open)close()});
-  dialog.querySelectorAll('.up-close,.up-return').forEach(function(b){b.addEventListener('click',close)});
-  dialog.addEventListener('close',function(){clearTimeout(timer);document.body.style.overflow=oldOverflow||'';dialog.classList.remove('climbing','arrived');trigger.focus()});
 })();
 </script>
 </body>

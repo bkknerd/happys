@@ -259,22 +259,6 @@ collections:
               - { label: Email box placeholder, name: placeholder, widget: string }
               - { label: Button, name: button, widget: string }
               - { label: Thank-you message, name: thanks, widget: string }
-          - label: The walk up (upstairs screen)
-            name: walk_up
-            widget: object
-            fields:
-              - { label: Small label, name: eyebrow, widget: string }
-              - { label: Description, name: description, widget: text }
-              - { label: The Walk Up's website, name: url, widget: string, hint: "Where the stairs lead. After the climb, visitors land here." }
-              - { label: Instagram handle (no @), name: instagram, widget: string }
-          - label: Storefront photo (next to the hours)
-            name: visit
-            widget: object
-            required: false
-            fields:
-              - { label: Photo, name: image, widget: image, required: false, choose_url: false }
-              - { label: Caption, name: caption, widget: string, required: false }
-              - { label: Description for screen readers, name: alt, widget: string, required: false }
           - label: Footer
             name: footer
             widget: object
