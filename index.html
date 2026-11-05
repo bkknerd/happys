@@ -144,6 +144,8 @@
 (function(){
   var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)};
   var FILES=['general','hours','menu','photos','events','reviews','flyers'];
+  /* inside the CMS preview pane, /admin sends unsaved edits to this page (see admin/index.html) */
+  var PREVIEW=window.parent!==window&&/[?&]cms-preview\b/.test(location.search);
   var COLORS={yellow:'#f5c518',pink:'#f6a9d2',blue:'#5ba7e8',orange:'#f59a3d',lavender:'#d9b3ff',mint:'#8fd0c4'};
   var FILTERS=[['all','all'],['specials','specials'],['cocktails','cocktails'],['beer','beer'],['shots','shots'],['zero','zero proof'],['wine','wine'],['food','food']];
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -153,18 +155,31 @@
 
   /* the CMS saves photos as /images/uploads/…; use them relative so the page works from any folder */
   function rel(o){if(typeof o==='string')return o.replace(/^\/(images\/uploads\/)/,'$1');if(Array.isArray(o))return o.map(rel);if(o&&typeof o==='object'){var r={};for(var k in o)r[k]=rel(o[k]);return r}return o}
-  var baked=document.getElementById('content-data');
-  (baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
+  var baked=document.getElementById('content-data'),raw={};
+  var loaded=(baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
   Promise.all(FILES.map(function(f){return fetch('content/'+f+'.json').then(function(r){if(!r.ok)throw new Error(f+'.json '+r.status);return r.json()})})))
-  .then(function(parts){parts=rel(parts);
-    var g=parts[0],C={closure:g.closure,hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5],flyers:(parts[6]||{}).flyers||[]};
-    render(C);
-  }).catch(function(e){console.error('content failed to load',e);document.documentElement.classList.add('no-content')});
+  .then(function(parts){parts=rel(parts);FILES.forEach(function(f,i){raw[f]=parts[i]});paint()});
+  loaded.catch(function(e){console.error('content failed to load',e);document.documentElement.classList.add('no-content')});
+  function paint(){
+    var g=raw.general;
+    render({closure:g.closure,hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:raw.hours,menu:raw.menu,photos:raw.photos,events:raw.events,reviews:raw.reviews,flyers:(raw.flyers||{}).flyers||[]});
+  }
+
+  if(PREVIEW){
+    document.documentElement.classList.add('cms-preview');
+    /* keep the preview on this page: links and forms do nothing */
+    document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(a&&a.getAttribute('href').charAt(0)!=='#')e.preventDefault()},true);
+    document.addEventListener('submit',function(e){e.preventDefault();e.stopPropagation()},true);
+    window.addEventListener('message',function(e){
+      var m=e.data;if(e.origin!==location.origin||!m||m.type!=='happys-preview'||FILES.indexOf(m.file)<0)return;
+      loaded.then(function(){raw[m.file]=rel(m.data);paint();if(m.anchor){var t=document.querySelector(m.anchor);if(t)t.scrollIntoView()}});
+    });
+  }
 
   function render(C){
     var ct=C.contact,ig='https://www.instagram.com/'+ct.instagram+'/';
     /* simple text slots */
-    $$('[data-t]').forEach(function(el){var v=get(C,el.dataset.t);el.innerHTML=br(v);if(v===''||v==null)el.hidden=true});
+    $$('[data-t]').forEach(function(el){var v=get(C,el.dataset.t);el.innerHTML=br(v);if(v===''||v==null){el.hidden=true;el.dataset.empty=1}else if(el.dataset.empty){el.hidden=false;delete el.dataset.empty}});
     $$('[data-ig]').forEach(function(a){a.href=ig});
     $$('[data-tel]').forEach(function(a){a.href='tel:+1'+String(ct.phone).replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'')});
     $$('[data-mail]').forEach(function(a){a.href='mailto:'+ct.email});
@@ -177,7 +192,7 @@
     $('#visit-addr').innerHTML=esc(ct.street.toLowerCase())+(ct.address_note?'<br>'+esc(ct.address_note.toLowerCase()):'')+'<br>'+esc((ct.city+', '+ct.state+' '+ct.zip).toLowerCase());
     $('#foot-addr').innerHTML=esc(ct.street)+(ct.address_note?'<br>'+esc(ct.address_note):'')+'<br>'+esc(ct.city+', '+ct.state+' '+ct.zip);
 
-    if(C.visit.image){var vp=$('#visit-photo');vp.hidden=false;vp.querySelector('img').src=C.visit.image;vp.querySelector('img').alt=C.visit.alt||'';vp.querySelector('figcaption').textContent=C.visit.caption||''}
+    if(C.visit.image){var vp=$('#visit-photo');vp.hidden=false;vp.querySelector('img').src=C.visit.image;vp.querySelector('img').alt=C.visit.alt||'';vp.querySelector('figcaption').textContent=C.visit.caption||''}else $('#visit-photo').hidden=true;
     menu(C.menu);photos(C.photos);events(C.events,C.flyers);reviews(C.reviews);hours(C.hours,C);closure(C.closure);
     if(!window.__PRERENDER__)reveal();
   }
@@ -197,14 +212,18 @@
     if(dd>1&&dd<7)return CL_DAYS[p.wd]+' at '+c;
     return CL_DAYS[p.wd].slice(0,3)+', '+['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][p.mon-1]+' '+p.dt+' at '+c}
   function closure(X){
-    var bar=$('#closure'),note=$('#closure-note'),timer;
-    function off(){bar.hidden=true;note.hidden=true;if(timer)clearInterval(timer)}
+    var bar=$('#closure'),note=$('#closure-note');
+    if(closure.timer)clearInterval(closure.timer);closure.timer=0;
+    function off(){bar.hidden=true;note.hidden=true;if(closure.timer)clearInterval(closure.timer)}
     if(!X||!X.show||window.__PRERENDER__)return off();
-    var re=clTime(X.reopens),st=clTime(X.starts);if(!re)return off();
+    var re=clTime(X.reopens),st=clTime(X.starts);
+    /* in the CMS preview, show it while the reopen time is still being picked */
+    if(!re&&PREVIEW)re=Infinity;
+    if(!re)return off();
     var head=X.headline||'closed for a private event';
     function tick(){
       var now=Date.now();if(now>=re)return off();
-      var during=!st||now>=st,same=st&&!during&&clParts(st).day===clParts(re).day,back='back open '+(same?'at '+clClock(clParts(re)):clPhrase(re,now));
+      var during=!st||now>=st,same=st&&!during&&re!==Infinity&&clParts(st).day===clParts(re).day,back=re===Infinity?'back open: pick a time':'back open '+(same?'at '+clClock(clParts(re)):clPhrase(re,now));
       $('#closure-kick').textContent=during?'private event':'heads up · private event';
       $('#closure-head').textContent=during?head:head+' '+clPhrase(st,now).replace(' at ',' from ');
       $('#closure-when').textContent=back;
@@ -212,7 +231,7 @@
       note.innerHTML='<b>'+esc(during?head:head+' '+clPhrase(st,now).replace(' at ',' from '))+'.</b> '+esc(back)+'.';
       bar.hidden=false;note.hidden=false;
     }
-    tick();timer=setInterval(tick,60000);
+    tick();closure.timer=setInterval(tick,60000);
   }
 
   /* menu */
@@ -246,7 +265,7 @@
       });
       $('#none').hidden=any;
     }
-    $('#q').addEventListener('input',filt);
+    $('#q').oninput=filt;
   }
 
   /* photos */
@@ -254,7 +273,7 @@
     var rot=['-1.5deg','1deg','-1deg','1.5deg','-.5deg'];
     $('#snaps-row').innerHTML=(p.items||[]).map(function(x,i){
       return '<li><figure style="--r:'+rot[i%rot.length]+'"><img src="'+esc(x.image)+'" alt="'+esc(x.alt||x.caption)+'" width="450" height="450" loading="lazy" decoding="async"><figcaption class="mono">'+esc(x.caption)+'</figcaption></figure></li>'}).join('');
-    if(!(p.items||[]).length)$('#snaps').hidden=true;
+    $('#snaps').hidden=!(p.items||[]).length;
   }
 
   /* events */
@@ -297,7 +316,7 @@
       var L=lineup(x);
       return '<article class="ev rv'+(L.indexOf('<ul')>-1?' has-lineup':'')+(x.poster&&!x.solo?' has-poster':'')+(x.solo?' solo-flyer':'')+'" style="--c:'+col(x.color)+'">'+(x.label?'<p class="mono">'+esc(x.label)+'</p>':'')+'<h3>'+esc(x.title)+'</h3>'+(x.body?'<p>'+br(x.body)+'</p>':'')+L+
         (x.button_text&&x.button_link?'<a class="btn" href="'+esc(x.button_link)+'"'+(ext?' target="_blank" rel="noopener"':'')+'>'+esc(x.button_text)+'</a>':'')+(x.solo?poster(x,' in-card'):'')+'</article>'}).join('')+posters;
-    if(!(e.items||[]).length){$('#events').hidden=true;$$('nav a[href="#events"]').forEach(function(a){a.parentNode.hidden=true})}
+    var none=!(e.items||[]).length;$('#events').hidden=none;$$('nav a[href="#events"]').forEach(function(a){a.parentNode.hidden=none});
   }
 
   /* reviews */
@@ -310,6 +329,7 @@
     $('#tags').innerHTML=(r.tags||[]).map(function(t){return '<span>'+esc(t)+'</span>'}).join('');
     $('#quotes').innerHTML=(r.quotes||[]).map(function(q){
       return '<figure class="quote" style="--c:'+col(q.color)+'"><blockquote><p>“'+esc(q.text)+'”</p></blockquote><figcaption class="mono">'+esc(q.who)+'</figcaption></figure>'}).join('');
+    if(PREVIEW)$('#stars i').style.width=(rating/5*100)+'%';
   }
   function rate(){
     $('#stars i').style.width=(rating/5*100)+'%';
@@ -339,7 +359,7 @@
       var d;try{d=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short'}).format(new Date()))}catch(e){d=new Date().getDay()}
       $$('#hours tr').forEach(function(r){r.classList.toggle('today',r.dataset.d.split(',').indexOf(String(d))>-1)});
     }
-    today();if(!window.__PRERENDER__)setInterval(today,600000);
+    today();if(!window.__PRERENDER__&&!hours.timer)hours.timer=setInterval(today,600000);
     /* structured data for search */
     function hm(h){if(h>=24)return '23:59';var H=Math.floor(h),M=Math.round((h-H)*60);return (H<10?'0':'')+H+':'+(M<10?'0':'')+M}
     var ct=C.contact,ld={"@context":"https://schema.org","@type":"BarOrPub",name:"happy’s",description:"Cocktail bar and event space in downtown "+ct.city+", "+ct.state+".",

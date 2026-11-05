@@ -19,9 +19,23 @@ media_folder: images/uploads
 public_folder: /images/uploads
 
 collections:
+  # ───────────────────────── START HERE (the guide, nothing to edit)
+  - name: start
+    label: "Start here: how to edit"
+    description: "New to this? Open the guide below. It covers the common jobs, from changing hours to closing for a private event."
+    editor: { preview: false }
+    files:
+      - name: guide
+        label: How to edit the site
+        file: admin/guide.json
+        format: json
+        fields:
+          - { label: Read me, name: guide, widget: happys-guide }
+
   - name: site
     label: Site content
-    editor: { preview: false }
+    description: "Pick a section. As you type, the preview on the right shows the site with your changes. Nothing goes live until you click Publish, and it's live about a minute after that."
+    editor: { preview: true }
     files:
 
       # ───────────────────────── HOURS
@@ -231,10 +245,10 @@ collections:
             hint: "Puts a big 'closed for a private event' notice at the top of the site and on the hours. It takes itself down once the reopen time passes."
             fields:
               - { label: Show the notice, name: show, widget: boolean, default: false }
-              - { label: Closed from (optional), name: starts, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Leave empty if you're closed right now. Set it to post a heads-up ahead of time." }
+              - { label: Closed from, name: starts, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Leave empty if you're closed right now. Set it to post a heads-up ahead of time." }
               - { label: Back open at, name: reopens, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Needed when the notice is on. Cary time." }
               - { label: Headline, name: headline, widget: string, default: "closed for a private event" }
-              - { label: Extra line (optional), name: message, widget: string, required: false, hint: "e.g. want the place to yourself? email us." }
+              - { label: Extra line, name: message, widget: string, required: false, hint: "e.g. want the place to yourself? email us." }
           - label: Contact
             name: contact
             widget: object
@@ -261,6 +275,13 @@ collections:
               - { label: Top-right extra (hidden on phones), name: topline_right_extra, widget: string, required: false }
               - { label: Menu button, name: menu_button, widget: string }
               - { label: Hours button, name: visit_button, widget: string }
+          - label: Storefront photo (in the hours and location section)
+            name: visit
+            widget: object
+            fields:
+              - { label: Photo, name: image, widget: image, choose_url: false, required: false, hint: "Leave empty to hide it." }
+              - { label: Caption, name: caption, widget: string, required: false }
+              - { label: Description for screen readers, name: alt, widget: string, required: false }
           - label: Email signup
             name: newsletter
             widget: object

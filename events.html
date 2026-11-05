@@ -195,34 +195,48 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
 (function(){
   var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)};
   var FILES=['private-events','general'];
+  /* inside the CMS preview pane, /admin sends unsaved edits to this page (see admin/index.html) */
+  var PREVIEW=window.parent!==window&&/[?&]cms-preview\b/.test(location.search);
   var COLORS={yellow:'#f5c518',pink:'#f6a9d2',blue:'#5ba7e8',orange:'#f59a3d',lavender:'#d9b3ff',mint:'#8fd0c4'};
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function br(s){return esc(s).replace(/\n/g,'<br>')}
   function get(o,p){return p.split('.').reduce(function(a,k){return a==null?a:a[k]},o)}
   /* the CMS saves photos as /images/uploads/…; use them relative so the page works from any folder */
   function rel(o){if(typeof o==='string')return o.replace(/^\/(images\/uploads\/)/,'$1');if(Array.isArray(o))return o.map(rel);if(o&&typeof o==='object'){var r={};for(var k in o)r[k]=rel(o[k]);return r}return o}
-  var baked=document.getElementById('content-data');
-  (baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
+  var baked=document.getElementById('content-data'),raw={};
+  var loaded=(baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
    Promise.all(FILES.map(function(f){return fetch('content/'+f+'.json').then(function(r){if(!r.ok)throw new Error(f);return r.json()})})))
-  .then(function(p){p=rel(p);render(p[0],p[1])})
-  .catch(function(e){console.error('content failed to load',e)});
+  .then(function(p){p=rel(p);FILES.forEach(function(f,i){raw[f]=p[i]});paint()});
+  loaded.catch(function(e){console.error('content failed to load',e)});
+  function paint(){render(raw['private-events'],raw.general)}
+
+  if(PREVIEW){
+    document.documentElement.classList.add('cms-preview');
+    /* keep the preview on this page: links and forms do nothing */
+    document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(a&&a.getAttribute('href').charAt(0)!=='#')e.preventDefault()},true);
+    document.addEventListener('submit',function(e){e.preventDefault();e.stopPropagation()},true);
+    window.addEventListener('message',function(e){
+      var m=e.data;if(e.origin!==location.origin||!m||m.type!=='happys-preview'||FILES.indexOf(m.file)<0)return;
+      loaded.then(function(){raw[m.file]=rel(m.data);paint();if(m.anchor){var t=document.querySelector(m.anchor);if(t)t.scrollIntoView()}});
+    });
+  }
 
   function render(E,G){
     var D=Object.assign({},E,{g:G}),ct=G.contact;
-    $$('[data-t]').forEach(function(el){var v=get(D,el.dataset.t);if(v==null||v===''){el.hidden=true}else el.innerHTML=br(v)});
+    $$('[data-t]').forEach(function(el){var v=get(D,el.dataset.t);if(v==null||v===''){el.hidden=true;el.dataset.empty=1}else{el.innerHTML=br(v);if(el.dataset.empty){el.hidden=false;delete el.dataset.empty}}});
     $$('[data-tel]').forEach(function(a){a.href='tel:+1'+String(ct.phone).replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'')});
     $$('[data-mail]').forEach(function(a){a.href='mailto:'+ct.email});
     $$('[data-ig]').forEach(function(a){a.href='https://www.instagram.com/'+ct.instagram+'/'});
     $('#foot-addr').innerHTML=esc(ct.street)+(ct.address_note?'<br>'+esc(ct.address_note):'')+'<br>'+esc(ct.city+', '+ct.state+' '+ct.zip);
-    var hi=$('#pe-hero-img');if(E.hero_image){hi.src=E.hero_image;hi.alt=E.hero_alt||''}else hi.parentNode.hidden=true;
+    var hi=$('#pe-hero-img');hi.parentNode.hidden=!E.hero_image;if(E.hero_image){hi.src=E.hero_image;hi.alt=E.hero_alt||''}
     $('#pe-photos').innerHTML=(E.photos||[]).map(function(x,i){
       return '<li><figure><img src="'+esc(x.image)+'" alt="'+esc(x.alt||x.caption)+'" width="900" height="900"'+(i?' loading="lazy"':'')+' decoding="async"><figcaption class="mono">'+esc(x.caption)+'</figcaption></figure></li>'}).join('');
-    if(!(E.photos||[]).length)$('#space').hidden=true;
+    $('#space').hidden=!(E.photos||[]).length;
     $('#pe-crit').innerHTML=(E.criteria||[]).map(function(c){
       return '<li style="--c:'+(COLORS[c.color]||COLORS.yellow)+'"><h3>'+esc(c.title)+'</h3><p>'+br(c.body)+'</p></li>'}).join('');
-    if(!(E.criteria||[]).length)$('#criteria').hidden=true;
+    $('#criteria').hidden=!(E.criteria||[]).length;
     $('#pe-steps').innerHTML=(E.steps||[]).map(function(s){return '<li><h3>'+esc(s.title)+'</h3><p>'+br(s.body)+'</p></li>'}).join('');
-    if(!(E.steps||[]).length)$('#how').hidden=true;
+    $('#how').hidden=!(E.steps||[]).length;
   }
 
   /* dates can't be in the past */

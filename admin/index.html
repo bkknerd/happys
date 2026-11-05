@@ -8,5 +8,88 @@
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@3.17.3/dist/decap-cms.js"></script>
+  <script>
+  /* Previews: the right-hand pane shows the real page with your unsaved changes,
+     scrolled to the part you're editing. The page itself does the drawing
+     (see "CMS preview" in index.html and events.html); this only sends it the edits. */
+  (function () {
+    var PAGES = {
+      general: ['index.html', '#top'],
+      hours: ['index.html', '#visit'],
+      menu: ['index.html', '#menu'],
+      events: ['index.html', '#events'],
+      flyers: ['index.html', '#events'],
+      photos: ['index.html', '#snaps'],
+      reviews: ['index.html', '#reviews'],
+      private_events: ['events.html', '']
+    };
+    var FILE = { private_events: 'private-events' };
+
+    /* photos picked in this session aren't on the site yet, so point the preview at the CMS's copy */
+    function withAssets(v, getAsset) {
+      if (typeof v === 'string') return /^\/?images\/uploads\//.test(v) ? String(getAsset(v)) : v;
+      if (Array.isArray(v)) return v.map(function (x) { return withAssets(x, getAsset); });
+      if (v && typeof v === 'object') { var o = {}; for (var k in v) o[k] = withAssets(v[k], getAsset); return o; }
+      return v;
+    }
+
+    function preview(name) {
+      var page = PAGES[name];
+      var src = new URL('../' + page[0] + '?cms-preview', location.href).href;
+      return createClass({
+        send: function () {
+          var f = this.frame;
+          if (!f || !f.contentWindow || !this.ready) return;
+          var data = this.props.entry.getIn(['data']);
+          f.contentWindow.postMessage({
+            type: 'happys-preview',
+            file: FILE[name] || name,
+            data: withAssets(data ? data.toJS() : {}, this.props.getAsset),
+            anchor: this.first ? page[1] : ''
+          }, location.origin);
+          this.first = false;
+        },
+        componentDidUpdate: function () { this.send(); },
+        render: function () {
+          var self = this;
+          return h('iframe', {
+            src: src,
+            title: 'Preview of the site',
+            ref: function (el) { self.frame = el; },
+            onLoad: function () { self.ready = true; self.first = true; self.send(); },
+            style: { border: 0, width: '100%', height: '100vh', display: 'block' }
+          });
+        }
+      });
+    }
+
+    Object.keys(PAGES).forEach(function (n) { CMS.registerPreviewTemplate(n, preview(n)); });
+    CMS.registerPreviewStyle('html,body{margin:0;padding:0;height:100%;overflow:hidden}body>div,.frame-content{height:100%}', { raw: true });
+
+    /* "Start here": shows admin/guide.html inside the editor. Nothing to save. */
+    var Guide = createClass({
+      getInitialState: function () { return { html: '<p>Loading the guide…</p>' }; },
+      componentDidMount: function () {
+        var self = this;
+        fetch('guide.html').then(function (r) { return r.text(); }).then(function (t) {
+          var css = /<style[^>]*>([\s\S]*?)<\/style>/i.exec(t), body = /<body[^>]*>([\s\S]*)<\/body>/i.exec(t);
+          self.setState({ html: (css ? '<style>' + css[1] + '</style>' : '') + (body ? body[1] : t) });
+        }).catch(function () {
+          self.setState({ html: '<p>The guide didn’t load. It’s also at <a href="guide.html" target="_blank">/admin/guide.html</a>.</p>' });
+        });
+      },
+      /* the guide's jump links would change the CMS's own address, so scroll instead */
+      jump: function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a) return;
+        e.preventDefault();
+        var t = e.currentTarget.querySelector(a.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      render: function () { return h('div', { onClick: this.jump, dangerouslySetInnerHTML: { __html: this.state.html } }); }
+    });
+    CMS.registerWidget('happys-guide', Guide);
+  })();
+  </script>
 </body>
 </html>

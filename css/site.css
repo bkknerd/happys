@@ -150,3 +150,7 @@ input[type=email]{flex:1 1 220px;font-family:inherit;font-size:17px;padding:14px
 .closure-note{margin:6px 0 16px;padding:12px 14px;border:1.5px solid var(--ink);background:var(--card);font-weight:700;font-size:16px}
 .closure-note b{color:var(--accent)}
 @media(max-width:600px){.closure{padding:18px 5vw 20px}.closure-when{white-space:normal}}
+
+/* inside the CMS preview pane: no scroll-in animation, so edits show straight away */
+.cms-preview .rv{opacity:1;transform:none;transition:none}
+.cms-preview #cur{display:none}

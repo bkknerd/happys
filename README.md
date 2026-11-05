@@ -16,7 +16,7 @@ content/            everything the owner can change
   private-events.json  the private events page: photos, criteria, steps, form text
   reviews.json      rating, tags, quotes
 images/uploads/     photos (new uploads from the CMS land here too)
-admin/              the CMS (index.html + config.yml)
+admin/              the CMS (index.html, config.yml, and guide.html, the owner guide)
 netlify.toml        hosting settings (build command, headers, /admin redirect)
 scripts/build.mjs   the deploy build: copies the site to dist/ and pre-renders index.html
 package.json        one dependency (jsdom) for the build
@@ -50,10 +50,12 @@ Open `admin/config.yml` and change `repo: OWNER/happys-site` to your real `user/
 - Spam is filtered with a hidden honeypot field.
 
 ### 5. CMS sign-in
-- On GitHub, go to **Settings → Developer settings → OAuth Apps → New OAuth App**.
-  - Homepage URL: `https://happysnc.com`
+- On GitHub, go to **github.com/settings/developers → OAuth Apps → New OAuth App**. (That's your account settings: profile picture → Settings → Developer settings at the bottom of the sidebar. The repo's own Settings tab doesn't have it.)
+  - Homepage URL: `https://happysnc.com` (or the site's `.netlify.app` address until the domain moves)
   - Authorization callback URL: `https://api.netlify.com/auth/done`
+- Copy the Client ID, then **Generate a new client secret** and copy it straight away (GitHub shows it once).
 - In Netlify, go to **Site configuration → Access & security → OAuth → Install provider → GitHub**, and paste the Client ID and Secret.
+- Test it at `https://YOUR-SITE.netlify.app/admin/` → **Login with GitHub**. The login only works on an address Netlify hosts for this site; until the domain moves, use the `.netlify.app` one.
 
 ### 6. Domain
 In Netlify, go to **Domain management → Add a domain** and add `happysnc.com`, then follow the DNS steps. HTTPS turns on by itself.
@@ -62,6 +64,25 @@ In Netlify, go to **Domain management → Add a domain** and add `happysnc.com`,
 Add the owner's GitHub account as a collaborator on the repo. They sign in at `happysnc.com/admin` with **Login with GitHub**.
 
 Each save in the CMS commits to the repo, and Netlify redeploys in under a minute.
+
+## Editing the site
+
+The full owner guide is inside the CMS: **Start here: how to edit**, the first item in the sidebar. The same page is at `/admin/guide.html` if you want to print it or send it to someone. Edit `admin/guide.html` to change it.
+
+The short version:
+
+1. Sign in at `/admin` with **Login with GitHub**.
+2. Open **Site content** and pick a section.
+3. Change things. The preview on the right shows the real page with the unsaved changes, scrolled to the part being edited.
+4. **Publish → Publish now**. Netlify redeploys and the change is live in about a minute.
+
+Common jobs, all covered in the guide: closing for a private event, hours, menu items and prices, next month's music flyer, photos, reviews, the private events page.
+
+### How the previews work
+
+The preview pane loads the real `index.html` (or `events.html` for the private events page) with `?cms-preview`, and `admin/index.html` posts the unsaved entry to it on every change. The page redraws itself with its own code, so the preview always matches the live site, including the closure notice, the flyer logic and the menu filters. Photos uploaded in the same session are passed as the CMS's local copies, so they show before they're published. Inside the preview, links and forms do nothing.
+
+Adding a new content file? Add it to `PAGES` in `admin/index.html` (which page shows it, and the section to scroll to) and to `FILES` in the page script.
 
 ## Editing on your own machine
 
@@ -93,7 +114,7 @@ The build fails on purpose if a content file is broken or the menu renders empty
 - **Photos:** square, at least 900px wide. Five fills the row.
 - **Events:** delete every card and the section and its nav link disappear.
 - **Search tags** (`<title>`, description, share tags) live in the `<head>` of `index.html`, not in the CMS, so link previews work even for crawlers that don't run JavaScript.
-- **Decap version** is pinned to 3.17.3 in `admin/index.html`. Bump it on purpose, not by accident.
+- **Decap version** is pinned to 3.17.3 in `admin/index.html`. Bump it on purpose, not by accident, and check the previews and the Start here guide afterwards (they use `registerPreviewTemplate` and a small custom widget).
 - **Why not Git Gateway / Netlify Identity:** Netlify Identity is supported again (Feb 2026), but Git Gateway, the piece Decap needs to use it, is still deprecated. The GitHub backend avoids it. The trade-off is that each editor needs a GitHub account.
 
 - **Private events page** (`events.html`): photos, criteria, steps and form text are all under **Private events page** in the CMS. The form's fields themselves are in `events.html`. Capacity, deposits and minimums are deliberately left off until the owner confirms them.
