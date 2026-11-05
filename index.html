@@ -39,6 +39,17 @@
 </defs></svg>
 <svg id="cur" viewBox="0 0 100 100" aria-hidden="true"><use href="#s-yellow"/></svg>
 
+<aside class="closure" id="closure" hidden aria-labelledby="closure-head">
+  <div class="closure-in">
+    <div>
+      <span class="closure-kick mono" id="closure-kick">private event</span>
+      <p class="closure-head" id="closure-head">closed for a private event</p>
+      <p class="closure-msg" id="closure-msg"></p>
+    </div>
+    <div class="closure-when" id="closure-when"></div>
+  </div>
+</aside>
+
 <nav>
   <a class="logo" href="#top" aria-label="happy’s home"><svg class="lg nv" viewBox="-4 -4 510 276" role="img" aria-label="happy’s — feel good"><use href="#logo"/></svg></a>
   <ul>
@@ -97,6 +108,7 @@
   <div class="visit">
     <div class="rv">
       <h2>hours</h2>
+      <p class="closure-note" id="closure-note" hidden></p>
       <table class="hours" id="hours"></table>
       <span class="mono" data-t="hours.note"></span>
       <div class="big" style="margin-top:34px" id="visit-addr"></div>
@@ -145,7 +157,7 @@
   (baked?Promise.resolve(JSON.parse(baked.textContent)).then(function(d){return FILES.map(function(f){return d[f]})}):
   Promise.all(FILES.map(function(f){return fetch('content/'+f+'.json').then(function(r){if(!r.ok)throw new Error(f+'.json '+r.status);return r.json()})})))
   .then(function(parts){parts=rel(parts);
-    var g=parts[0],C={hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5],flyers:(parts[6]||{}).flyers||[]};
+    var g=parts[0],C={closure:g.closure,hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:parts[1],menu:parts[2],photos:parts[3],events:parts[4],reviews:parts[5],flyers:(parts[6]||{}).flyers||[]};
     render(C);
   }).catch(function(e){console.error('content failed to load',e);document.documentElement.classList.add('no-content')});
 
@@ -166,8 +178,41 @@
     $('#foot-addr').innerHTML=esc(ct.street)+(ct.address_note?'<br>'+esc(ct.address_note):'')+'<br>'+esc(ct.city+', '+ct.state+' '+ct.zip);
 
     if(C.visit.image){var vp=$('#visit-photo');vp.hidden=false;vp.querySelector('img').src=C.visit.image;vp.querySelector('img').alt=C.visit.alt||'';vp.querySelector('figcaption').textContent=C.visit.caption||''}
-    menu(C.menu);photos(C.photos);events(C.events,C.flyers);reviews(C.reviews);hours(C.hours,C);
+    menu(C.menu);photos(C.photos);events(C.events,C.flyers);reviews(C.reviews);hours(C.hours,C);closure(C.closure);
     if(!window.__PRERENDER__)reveal();
+  }
+
+  /* private event closure: shows when switched on in the CMS, hides itself once the reopen time passes.
+     Times from the CMS have no zone, so they are read as Cary time (America/New_York). */
+  var CL_TZ='America/New_York',CL_DAYS=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  function clOff(day){try{var z=new Intl.DateTimeFormat('en-US',{timeZone:CL_TZ,timeZoneName:'longOffset'}).formatToParts(new Date(day+'T12:00:00Z')).filter(function(p){return p.type==='timeZoneName'})[0].value.replace('GMT','');return z||'+00:00'}catch(e){return '-05:00'}}
+  function clTime(v){if(!v)return null;v=String(v).trim();if(/(Z|[+-]\d\d:?\d\d)$/.test(v)){var t=Date.parse(v);return isNaN(t)?null:t}
+    var m=/^(\d{4}-\d{2}-\d{2})[T ](\d{1,2}):(\d{2})/.exec(v);if(!m)return null;var t2=Date.parse(m[1]+'T'+(m[2].length<2?'0':'')+m[2]+':'+m[3]+':00'+clOff(m[1]));return isNaN(t2)?null:t2}
+  function clParts(t){var o={};try{new Intl.DateTimeFormat('en-US',{timeZone:CL_TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'numeric',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(t)).forEach(function(p){o[p.type]=p.value})}catch(e){var d=new Date(t);o={year:d.getFullYear(),month:d.getMonth()+1,day:d.getDate(),hour:d.getHours(),minute:d.getMinutes()}}
+    var day=Date.UTC(+o.year,+o.month-1,+o.day);return {day:day,wd:new Date(day).getUTCDay(),h:+o.hour%24,mi:+o.minute,mon:+o.month,dt:+o.day}}
+  function clClock(p){if(p.h===12&&!p.mi)return 'noon';if(p.h===0&&!p.mi)return 'midnight';return ((p.h%12)||12)+(p.mi?':'+(p.mi<10?'0':'')+p.mi:'')+(p.h<12?'am':'pm')}
+  function clPhrase(t,now){var p=clParts(t),n=clParts(now),dd=Math.round((p.day-n.day)/864e5),c=clClock(p);
+    if(dd===0)return (p.h>=17?'tonight':'today')+' at '+c;
+    if(dd===1)return (p.h>=17?'tomorrow night':'tomorrow')+' at '+c;
+    if(dd>1&&dd<7)return CL_DAYS[p.wd]+' at '+c;
+    return CL_DAYS[p.wd].slice(0,3)+', '+['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][p.mon-1]+' '+p.dt+' at '+c}
+  function closure(X){
+    var bar=$('#closure'),note=$('#closure-note'),timer;
+    function off(){bar.hidden=true;note.hidden=true;if(timer)clearInterval(timer)}
+    if(!X||!X.show||window.__PRERENDER__)return off();
+    var re=clTime(X.reopens),st=clTime(X.starts);if(!re)return off();
+    var head=X.headline||'closed for a private event';
+    function tick(){
+      var now=Date.now();if(now>=re)return off();
+      var during=!st||now>=st,same=st&&!during&&clParts(st).day===clParts(re).day,back='back open '+(same?'at '+clClock(clParts(re)):clPhrase(re,now));
+      $('#closure-kick').textContent=during?'private event':'heads up · private event';
+      $('#closure-head').textContent=during?head:head+' '+clPhrase(st,now).replace(' at ',' from ');
+      $('#closure-when').textContent=back;
+      $('#closure-msg').textContent=X.message||'';
+      note.innerHTML='<b>'+esc(during?head:head+' '+clPhrase(st,now).replace(' at ',' from '))+'.</b> '+esc(back)+'.';
+      bar.hidden=false;note.hidden=false;
+    }
+    tick();timer=setInterval(tick,60000);
   }
 
   /* menu */
