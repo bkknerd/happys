@@ -143,7 +143,7 @@
 /* Everything on this page comes from the files in /content (edited at /admin). */
 (function(){
   var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)};
-  var FILES=['general','hours','menu','photos','events','reviews','flyers'];
+  var FILES=['general','hours','menu','photos','events','reviews','flyers','closure'];
   /* inside the CMS preview pane, /admin sends unsaved edits to this page (see admin/index.html) */
   var PREVIEW=window.parent!==window&&/[?&]cms-preview\b/.test(location.search);
   var COLORS={yellow:'#f5c518',pink:'#f6a9d2',blue:'#5ba7e8',orange:'#f59a3d',lavender:'#d9b3ff',mint:'#8fd0c4'};
@@ -162,7 +162,7 @@
   loaded.catch(function(e){console.error('content failed to load',e);document.documentElement.classList.add('no-content')});
   function paint(){
     var g=raw.general;
-    render({closure:g.closure,hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:raw.hours,menu:raw.menu,photos:raw.photos,events:raw.events,reviews:raw.reviews,flyers:(raw.flyers||{}).flyers||[]});
+    render({closure:raw.closure||g.closure,hero:g.hero,contact:g.contact,newsletter:g.newsletter,footer:g.footer,visit:g.visit||{},hours:raw.hours,menu:raw.menu,photos:raw.photos,events:raw.events,reviews:raw.reviews,flyers:(raw.flyers||{}).flyers||[]});
   }
 
   if(PREVIEW){

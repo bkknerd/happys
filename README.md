@@ -8,6 +8,7 @@ events.html         the private events page: the space, what works here, inquiry
 css/site.css        styles shared by both pages
 content/            everything the owner can change
   general.json      contact, top of the page, storefront photo, email signup, footer
+  closure.json      the "closed for a private event" notice and when you reopen
   hours.json        open days and times
   menu.json         menu sections and items
   photos.json       the "lately at happy's" strip

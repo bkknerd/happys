@@ -38,6 +38,18 @@ collections:
     editor: { preview: true }
     files:
 
+      # ───────────────────────── CLOSED FOR A PRIVATE EVENT
+      - name: closure
+        label: Closed for a private event
+        file: content/closure.json
+        format: json
+        fields:
+          - { label: Show the notice, name: show, widget: boolean, default: false, hint: "Puts a big notice across the top of the site and above the hours, with the time you reopen. It comes down by itself once that time passes." }
+          - { label: Closed from, name: starts, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Leave empty if you're closed right now. Set it to post a heads-up ahead of time." }
+          - { label: Back open at, name: reopens, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Needed when the notice is on. Cary time." }
+          - { label: Headline, name: headline, widget: string, default: "closed for a private event" }
+          - { label: Extra line, name: message, widget: string, required: false, hint: "e.g. want the place to yourself? email us." }
+
       # ───────────────────────── HOURS
       - name: hours
         label: Hours
@@ -238,17 +250,6 @@ collections:
         file: content/general.json
         format: json
         fields:
-          - label: Private event closure
-            name: closure
-            widget: object
-            collapsed: false
-            hint: "Puts a big 'closed for a private event' notice at the top of the site and on the hours. It takes itself down once the reopen time passes."
-            fields:
-              - { label: Show the notice, name: show, widget: boolean, default: false }
-              - { label: Closed from, name: starts, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Leave empty if you're closed right now. Set it to post a heads-up ahead of time." }
-              - { label: Back open at, name: reopens, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Needed when the notice is on. Cary time." }
-              - { label: Headline, name: headline, widget: string, default: "closed for a private event" }
-              - { label: Extra line, name: message, widget: string, required: false, hint: "e.g. want the place to yourself? email us." }
           - label: Contact
             name: contact
             widget: object
