@@ -1,997 +1,299 @@
-# Decap CMS — every editable area of the Milo's Cafe site.
+# Decap CMS for happy's. The editor lives at /admin.
+# Every change saves a commit to the GitHub repo, and the host redeploys the site.
+
 backend:
-  name: git-gateway
+  name: github
+  repo: bkknerd/happys
   branch: main
-  commit_messages:
-    update: 'CMS: update {{slug}}'
-    uploadMedia: 'CMS: upload {{path}}'
-    deleteMedia: 'CMS: delete {{path}}'
+  # Sign-in goes through Netlify's GitHub OAuth (Site settings → Access & security → OAuth → GitHub).
+  # Hosting somewhere else? Point base_url at your own OAuth proxy instead.
+
+# Lets you test the editor on your machine: run `npx decap-server` in this folder, then open /admin.
 local_backend: true
-site_url: /
-display_url: /
-logo_url: /images/logo.png
-media_folder: src/images/uploads
+
+site_url: https://happysnc.com
+display_url: https://happysnc.com
+logo_url: /images/uploads/hero-smiley-wall.webp
+
+media_folder: images/uploads
 public_folder: /images/uploads
+
 collections:
-- name: site
-  label: Website
-  editor:
-    preview: false
-  files:
-  - name: settings
-    label: Business info & SEO
-    file: src/_data/settings.json
-    fields:
-    - name: business_name
-      label: Business name
-      widget: string
-    - name: site_url
-      label: Website address
-      widget: string
-      required: false
-      hint: e.g. https://miloseuropeancafe.com, no slash at the end. Used for Google, link previews and the sitemap.
-    - name: gtm_id
-      label: Google Tag Manager ID
-      widget: string
-      required: false
-      hint: e.g. GTM-XXXXXXX. Leave empty to turn tracking off.
-    - name: seo_title
-      label: Browser tab / Google title
-      widget: string
-    - name: seo_description
-      label: Google description
-      widget: text
-    - name: share_title
-      label: Link preview title
-      widget: string
-    - name: share_description
-      label: Link preview description
-      widget: text
-    - name: share_image
-      label: Link preview image (1200×630)
-      widget: image
-      choose_url: false
-    - name: logo
-      label: Logo (light backgrounds)
-      widget: image
-      choose_url: false
-    - name: logo_light
-      label: Logo for dark backgrounds (footer)
-      widget: image
-      choose_url: false
-    - name: street
-      label: Street
-      widget: string
-    - name: city
-      label: City
-      widget: string
-    - name: state
-      label: State
-      widget: string
-    - name: zip
-      label: ZIP
-      widget: string
-    - name: latitude
-      label: Latitude
-      widget: number
-      value_type: float
-      step: 1.0e-07
-      hint: Used for the live weather and Waze link.
-    - name: longitude
-      label: Longitude
-      widget: number
-      value_type: float
-      step: 1.0e-07
-    - name: phone_display
-      label: Phone (as shown)
-      widget: string
-    - name: phone_dial
-      label: Phone (for tapping to call)
-      widget: string
-      hint: Digits with country code, e.g. +19194438000
-    - name: order_url
-      label: Online ordering link
-      widget: string
-    - name: order_provider
-      label: Online ordering service name
-      widget: string
-      hint: Used to tell screen-reader users where the Order button goes, e.g. SpotOn
-    - name: instagram_handle
-      label: Instagram handle (no @)
-      widget: string
-    - name: instagram_url
-      label: Instagram link
-      widget: string
-    - name: instagram_hours_url
-      label: Instagram link for holiday hours
-      widget: string
-    - name: yelp_url
-      label: Yelp link
-      widget: string
-    - name: cuisine
-      label: Cuisine types (for Google)
-      widget: list
-      field:
-        name: item
-        label: Item
-        widget: string
-    - name: area_served
-      label: Towns you serve (for Google and AI search)
-      widget: list
-      field:
-        name: item
-        label: Item
-        widget: string
-      hint: e.g. Morrisville, Cary
-  - name: hours
-    label: Opening hours
-    file: src/_data/hours.json
-    fields:
-    - name: days
-      label: Days
-      widget: list
-      fields:
-      - name: day
-        label: Day
-        widget: select
-        options:
-        - Monday
-        - Tuesday
-        - Wednesday
-        - Thursday
-        - Friday
-        - Saturday
-        - Sunday
-      - name: closed
-        label: Closed all day
-        widget: boolean
-        default: false
-      - name: open
-        label: Opens
-        widget: string
-        pattern:
-        - ^([01]\d|2[0-3]):[0-5]\d$
-        - Use 24-hour time, like 07:00 or 16:30
-      - name: close
-        label: Closes
-        widget: string
-        pattern:
-        - ^([01]\d|2[0-3]):[0-5]\d$
-        - Use 24-hour time, like 07:00 or 16:30
-      allow_add: false
-      allow_reorder: false
-      min: 7
-      max: 7
-      summary: '{{fields.day}}: {{fields.open}}–{{fields.close}}'
-      hint: Updates the header, the footer, the FAQ, the patio scene and Google listing data.
-    - name: note
-      label: Note under hours
-      widget: string
-    - name: note_link_label
-      label: Instagram link text
-      widget: string
-      required: false
-  - name: header
-    label: Header & phone bar
-    file: src/_data/header.json
-    fields:
-    - name: topbar_today_label
-      label: 'Header: label before today’s hours'
-      widget: string
-      hint: e.g. Today
-    - name: nav
-      label: Menu links
-      widget: list
-      fields:
-      - name: label
-        label: Label
-        widget: string
-      - name: target
-        label: Goes to
-        widget: select
-        options:
-        - label: Story (about)
-          value: kitchen
-        - label: Menu
-          value: menu
-        - label: Reviews
-          value: reviews
-        - label: Photos
-          value: gallery
-        - label: FAQ
-          value: faq
-        - label: Live patio
-          value: patio
-        - label: Visit (footer)
-          value: visit
-      summary: '{{fields.label}}'
-    - name: order_button
-      label: Header order button
-      widget: string
-    - name: mobile_menu_label
-      label: 'Phone header: menu link text'
-      widget: string
-    - name: mobile_bar_order
-      label: 'Phone bottom bar: order button'
-      widget: string
-    - name: mobile_bar_call
-      label: 'Phone bottom bar: call button'
-      widget: string
-    - name: mobile_bar_directions
-      label: 'Phone bottom bar: directions button'
-      widget: string
-  - name: hero
-    label: Top of page
-    file: src/_data/hero.json
-    fields:
-    - name: eyebrow
-      label: Small line above the headline (what and where)
-      widget: string
-      required: false
-      hint: 'Helps Google and AI search: say what you are and where, e.g. Coffee shop & sandwich café in Morrisville, NC'
-    - name: headline
-      label: Headline
-      widget: string
-    - name: headline_italic
-      label: Headline, italic second line
-      widget: string
-      required: false
-    - name: intro
-      label: Intro
-      widget: text
-    - name: primary_label
-      label: Main button text
-      widget: string
-      required: false
-    - name: primary_url
-      label: Main button link
-      widget: string
-    - name: secondary_label
-      label: Second button text
-      widget: string
-      required: false
-    - name: secondary_url
-      label: Second button link
-      widget: string
-      hint: '#menu jumps to the menu.'
-  - name: patio
-    label: Live patio (top of page)
-    file: src/_data/patio.json
-    fields:
-    - name: enabled
-      label: Show the live patio scene
-      widget: boolean
-      default: true
-    - name: intro
-      label: Caption under the scene
-      widget: text
-    - name: card_live
-      label: 'Card: live label'
-      widget: string
-    - name: card_preview
-      label: 'Card: preview label'
-      widget: string
-    - name: card_place
-      label: 'Card: place name'
-      widget: string
-    - name: card_checking
-      label: 'Card: text while loading'
-      widget: string
-    - name: slider_label
-      label: Slider label
-      widget: string
-    - name: back_to_now
-      label: '''Back to now'' button'
-      widget: string
-    - name: sky_label
-      label: Sky buttons label (screen readers)
-      widget: string
-    - name: chip_live
-      label: 'Sky: Live'
-      widget: string
-    - name: chip_clear
-      label: 'Sky: Clear'
-      widget: string
-    - name: chip_cloudy
-      label: 'Sky: Cloudy'
-      widget: string
-    - name: chip_rain
-      label: 'Sky: Rain'
-      widget: string
-    - name: verdicts
-      label: Closed-day text
-      widget: object
-      fields:
-      - name: closed_today
-        label: Header text on a closed day
-        widget: string
-  - name: kitchen
-    label: Story
-    file: src/_data/kitchen.json
-    fields:
-    - name: enabled
-      label: Show this section
-      widget: boolean
-      default: true
-      hint: Turn off to hide the section and its menu link.
-    - name: heading
-      label: Heading
-      widget: string
-    - name: heading_italic
-      label: Heading, italic second part (optional)
-      widget: string
-      required: false
-    - name: body
-      label: Story (first paragraph, shown large)
-      widget: text
-    - name: body_more
-      label: More story (optional; leave a blank line between paragraphs)
-      widget: markdown
-      buttons:
-      - bold
-      - italic
-      - link
-      editor_components: []
-      minimal: true
-      required: false
-    - name: image
-      label: Story photo
-      widget: image
-      choose_url: false
-    - name: image_alt
-      label: Story photo description
-      widget: string
-    - name: image_caption
-      label: Story photo caption
-      widget: string
-      required: false
-    - name: story_label
-      label: Story link text
-      widget: string
-      required: false
-    - name: story_url
-      label: Story link
-      widget: string
-      required: false
-    - name: cards
-      label: Specialties
-      widget: list
-      fields:
-      - name: icon
-        label: Drawn icon (leave empty to show the photo)
-        widget: select
-        required: false
-        options:
-        - label: Focaccia sandwich
-          value: sandwich
-        - label: Crepe
-          value: crepe
-        - label: Coffee cup
-          value: cup
-        - label: Croissant
-          value: croissant
-        - label: Pine tree
-          value: pine
-      - name: image
-        label: Photo
-        widget: image
-        choose_url: false
-      - name: alt
-        label: Photo description
-        widget: string
-        required: false
-      - name: title
-        label: Title
-        widget: string
-      - name: text
-        label: Text
-        widget: text
-      summary: '{{fields.title}}'
-    - name: award_show
-      label: Show award
-      widget: boolean
-      default: true
-    - name: award_title
-      label: Award title
-      widget: string
-    - name: award_subtitle
-      label: Award subtitle
-      widget: string
-    - name: award_link_label
-      label: Award link text
-      widget: string
-      required: false
-    - name: award_link_url
-      label: Award link
-      widget: string
-      required: false
-    - name: pair_show
-      label: Show 'Can't decide?' pairing
-      widget: boolean
-      default: true
-    - name: pair_heading
-      label: Pairing heading
-      widget: string
-    - name: pair_helper
-      label: Pairing helper text
-      widget: string
-    - name: pair_food_label
-      label: Food field label
-      widget: string
-    - name: pair_drink_label
-      label: Drink field label
-      widget: string
-    - name: pair_food_placeholder
-      label: Food dropdown default
-      widget: string
-    - name: pair_drink_placeholder
-      label: Drink dropdown default
-      widget: string
-    - name: pair_button
-      label: Pairing button
-      widget: string
-    - name: pair_and
-      label: Symbol between food and drink
-      widget: string
-      hint: e.g. &
-    - name: pair_start
-      label: Message if no pairing can be made
-      widget: string
-    - name: food_moods
-      label: Food moods
-      widget: list
-      fields:
-      - name: mood
-        label: Mood
-        widget: string
-      - name: items
-        label: Suggestions
-        widget: list
-        field:
-          name: item
-          label: Item
-          widget: string
-        hint: Use menu item names exactly as they appear on the menu.
-      summary: '{{fields.mood}}'
-    - name: drink_moods
-      label: Drink moods
-      widget: list
-      fields:
-      - name: mood
-        label: Mood
-        widget: string
-      - name: items
-        label: Suggestions
-        widget: list
-        field:
-          name: item
-          label: Item
-          widget: string
-        hint: Use menu item names exactly as they appear on the menu.
-      summary: '{{fields.mood}}'
-  - name: menu
-    label: Menu
-    file: src/_data/menu.json
-    fields:
-    - name: enabled
-      label: Show this section
-      widget: boolean
-      default: true
-      hint: Turn off to hide the section and its menu link.
-    - name: heading
-      label: Heading
-      widget: string
-    - name: heading_italic
-      label: Heading, italic second part (optional)
-      widget: string
-      required: false
-    - name: food_tab
-      label: Food tab label
-      widget: string
-    - name: drinks_tab
-      label: Drinks tab label
-      widget: string
-    - name: meat_free_label
-      label: Meat-free button
-      widget: string
-    - name: search_placeholder
-      label: Search box text
-      widget: string
-    - name: no_results
-      label: No-results message
-      widget: string
-    - name: footnote
-      label: Footnote (after ★)
-      widget: text
-    - name: favorites_show
-      label: Show House favorites
-      widget: boolean
-      default: false
-      hint: Turn on to show the photo strip at the top of the menu.
-    - name: favorites_heading
-      label: House favorites heading
-      widget: string
-    - name: favorites
-      label: House favorites (photo strip at the top of the menu)
-      widget: list
-      fields:
-      - name: item
-        label: Menu item name
-        widget: string
-        hint: Must match the item name exactly, e.g. Schnitzel Focaccia
-      - name: image
-        label: Photo
-        widget: image
-        choose_url: false
-      - name: alt
-        label: Photo description
-        widget: string
-        required: false
-      summary: '{{fields.item}}'
-      max: 4
-    - name: food
-      label: Food
-      widget: list
-      fields:
-      - name: category
-        label: Category
-        widget: string
-      - name: compact
-        label: Compact list (names and prices only, e.g. bottled drinks)
-        widget: boolean
-        default: false
-      - name: items
-        label: Items
-        widget: list
+  # ───────────────────────── START HERE (the guide, nothing to edit)
+  - name: start
+    label: "Start here: how to edit"
+    description: "New to this? Open the guide below. It covers the common jobs, from changing hours to closing for a private event."
+    editor: { preview: false }
+    files:
+      - name: guide
+        label: How to edit the site
+        file: admin/guide.json
+        format: json
         fields:
-        - name: name
-          label: Name
-          widget: string
-        - name: price
-          label: Price
-          widget: number
-          value_type: float
-          step: 0.01
-          min: 0
-          required: false
-          hint: Leave empty to show no price.
-        - name: description
-          label: Description
-          widget: text
-          required: false
-        - name: favorite
-          label: Guest favorite ★
-          widget: boolean
-          default: false
-        - name: contains_meat
-          label: Contains meat (hidden by the Meat-free filter)
-          widget: boolean
-          default: false
-        - name: layers
-          label: Drink layers (cup graphic)
-          widget: list
-          fields:
-          - name: layer
-            label: Layer
-            widget: select
-            options:
-            - label: Espresso
-              value: espresso
-            - label: Steamed milk
-              value: milk
-            - label: Milk foam
-              value: foam
-            - label: Hot water
-              value: water
-            - label: Ice
-              value: ice
-            - label: Cold brew
-              value: coldbrew
-            - label: Drip coffee
-              value: coffee
-            - label: Sweet cream
-              value: cream
-            - label: Tonic
-              value: tonic
-            - label: Gelato
-              value: gelato
-            - label: Chocolate
-              value: chocolate
-            - label: House syrup
-              value: syrup
-            - label: Matcha
-              value: matcha
-            - label: Strawberry
-              value: strawberry
-            - label: Chai
-              value: chai
-            - label: Earl grey / tea
-              value: tea
-            - label: Apple cider
-              value: cider
-          - name: parts
-            label: Parts
-            widget: number
-            value_type: float
-            step: 0.1
-            min: 0.1
-          required: false
-          collapsed: true
-          summary: '{{fields.parts}} × {{fields.layer}}'
-          hint: Drinks only. Bottom to top; leave empty for no cup. Parts are relative, e.g. 1 espresso, 3 steamed milk, 0.5 milk foam.
-        summary: '{{fields.name}}'
-        collapsed: true
-      summary: '{{fields.category}}'
-      collapsed: true
-    - name: drinks
-      label: Drinks
-      widget: list
-      fields:
-      - name: category
-        label: Category
-        widget: string
-      - name: compact
-        label: Compact list (names and prices only, e.g. bottled drinks)
-        widget: boolean
-        default: false
-      - name: items
-        label: Items
-        widget: list
+          - { label: Read me, name: guide, widget: happys-guide }
+
+  - name: site
+    label: Site content
+    description: "Pick a section. As you type, the preview on the right shows the site with your changes. Nothing goes live until you click Publish, and it's live about a minute after that."
+    editor: { preview: true }
+    files:
+
+      # ───────────────────────── CLOSED FOR A PRIVATE EVENT
+      - name: closure
+        label: Closed for a private event
+        file: content/closure.json
+        format: json
         fields:
-        - name: name
-          label: Name
-          widget: string
-        - name: price
-          label: Price
-          widget: number
-          value_type: float
-          step: 0.01
-          min: 0
-          required: false
-          hint: Leave empty to show no price.
-        - name: description
-          label: Description
-          widget: text
-          required: false
-        - name: favorite
-          label: Guest favorite ★
-          widget: boolean
-          default: false
-        - name: contains_meat
-          label: Contains meat (hidden by the Meat-free filter)
-          widget: boolean
-          default: false
-        - name: layers
-          label: Drink layers (cup graphic)
-          widget: list
-          fields:
-          - name: layer
-            label: Layer
-            widget: select
-            options:
-            - label: Espresso
-              value: espresso
-            - label: Steamed milk
-              value: milk
-            - label: Milk foam
-              value: foam
-            - label: Hot water
-              value: water
-            - label: Ice
-              value: ice
-            - label: Cold brew
-              value: coldbrew
-            - label: Drip coffee
-              value: coffee
-            - label: Sweet cream
-              value: cream
-            - label: Tonic
-              value: tonic
-            - label: Gelato
-              value: gelato
-            - label: Chocolate
-              value: chocolate
-            - label: House syrup
-              value: syrup
-            - label: Matcha
-              value: matcha
-            - label: Strawberry
-              value: strawberry
-            - label: Chai
-              value: chai
-            - label: Earl grey / tea
-              value: tea
-            - label: Apple cider
-              value: cider
-          - name: parts
-            label: Parts
-            widget: number
-            value_type: float
-            step: 0.1
-            min: 0.1
-          required: false
-          collapsed: true
-          summary: '{{fields.parts}} × {{fields.layer}}'
-          hint: Drinks only. Bottom to top; leave empty for no cup. Parts are relative, e.g. 1 espresso, 3 steamed milk, 0.5 milk foam.
-        summary: '{{fields.name}}'
-        collapsed: true
-      summary: '{{fields.category}}'
-      collapsed: true
-  - name: reviews
-    label: Reviews
-    file: src/_data/reviews.json
-    fields:
-    - name: enabled
-      label: Show this section
-      widget: boolean
-      default: true
-      hint: Turn off to hide the section and its menu link.
-    - name: heading
-      label: Heading
-      widget: string
-    - name: heading_italic
-      label: Heading, italic second part (optional)
-      widget: string
-      required: false
-    - name: rating
-      label: Rating
-      widget: string
-    - name: rating_sources
-      label: Rating sources (one per line)
-      widget: text
-    - name: notes
-      label: Small print (optional)
-      widget: markdown
-      buttons:
-      - bold
-      - italic
-      - link
-      editor_components: []
-      minimal: true
-      required: false
-    - name: quotes
-      label: Quotes (the first is shown large)
-      widget: list
-      fields:
-      - name: text
-        label: Quote
-        widget: text
-      - name: source
-        label: Source
-        widget: string
-      summary: '{{fields.text}}'
-    - name: mentions_label
-      label: '''Guests often mention'' label'
-      widget: string
-    - name: mentions
-      label: Often mentioned
-      widget: list
-      field:
-        name: item
-        label: Item
-        widget: string
-    - name: good_to_know
-      label: Good to know
-      widget: markdown
-      buttons:
-      - bold
-      - italic
-      - link
-      editor_components: []
-      minimal: true
-      required: false
-    - name: google_link_label
-      label: Google reviews link text
-      widget: string
-    - name: yelp_link_label
-      label: Yelp reviews link text
-      widget: string
-  - name: gallery
-    label: 'Photos: inside and out'
-    file: src/_data/gallery.json
-    fields:
-    - name: enabled
-      label: Show this section
-      widget: boolean
-      default: true
-      hint: Turn off to hide the section and its menu link.
-    - name: heading
-      label: Heading
-      widget: string
-    - name: heading_italic
-      label: Heading, italic second part (optional)
-      widget: string
-      required: false
-    - name: intro
-      label: Intro
-      widget: text
-    - name: photos
-      label: Photos
-      widget: list
-      fields:
-      - name: image
-        label: Photo
-        widget: image
-        choose_url: false
-      - name: caption
-        label: Caption (also used as image description)
-        widget: string
-      - name: wide
-        label: Wide (use for landscape photos)
-        widget: boolean
-        default: false
-      summary: '{{fields.caption}}'
-    - name: instagram_lead
-      label: Text before the Instagram button
-      widget: string
-      required: false
-    - name: follow_label
-      label: Instagram button text
-      widget: string
-  - name: comingsoon
-    label: Coming soon page
-    file: src/_data/comingsoon.json
-    fields:
-    - name: page_title
-      label: Browser tab / Google title
-      widget: string
-    - name: page_description
-      label: Google description
-      widget: text
-    - name: kicker
-      label: Small line above the headline
-      widget: string
-    - name: headline
-      label: Headline
-      widget: string
-    - name: headline_italic
-      label: Headline, second line (italic)
-      widget: string
-    - name: intro
-      label: Intro
-      widget: text
-    - name: order_label
-      label: Order button
-      widget: string
-    - name: call_label
-      label: Call button
-      widget: string
-    - name: directions_label
-      label: Directions button
-      widget: string
-    - name: today_label
-      label: Label before today's hours
-      widget: string
-    - name: scene_caption
-      label: Text under the drawing
-      widget: text
-    - name: address_label
-      label: 'Footer: address label'
-      widget: string
-    - name: hours_label
-      label: 'Footer: hours label'
-      widget: string
-    - name: contact_label
-      label: 'Footer: phone and Instagram label'
-      widget: string
-  - name: faq
-    label: FAQ
-    file: src/_data/faq.json
-    fields:
-    - name: enabled
-      label: Show this section
-      widget: boolean
-      default: true
-      hint: Turn off to hide the section and its menu link.
-    - name: heading
-      label: Heading
-      widget: string
-    - name: heading_italic
-      label: Heading, italic second part (optional)
-      widget: string
-      required: false
-    - name: note_text
-      label: Text before the phone number (under the heading)
-      widget: string
-      required: false
-    - name: note_after
-      label: Text after the phone number
-      widget: string
-      required: false
-    - name: show_drawing
-      label: Show the little drawings under the phone line
-      widget: boolean
-      default: true
-    - name: items
-      label: Questions
-      widget: list
-      fields:
-      - name: question
-        label: Question
-        widget: string
-      - name: answer
-        label: Answer
-        widget: markdown
-        buttons:
-        - bold
-        - italic
-        - link
-        editor_components: []
-        minimal: true
-        required: false
-      - name: show_hours
-        label: Add opening hours under the answer
-        widget: boolean
-        default: false
-      summary: '{{fields.question}}'
-  - name: visit
-    label: Visit (footer)
-    file: src/_data/visit.json
-    fields:
-    - name: cta_heading
-      label: Footer heading
-      widget: string
-    - name: cta_text
-      label: Footer text
-      widget: string
-    - name: cta_buttons
-      label: Footer buttons
-      widget: list
-      fields:
-      - name: label
-        label: Text
-        widget: string
-      - name: link
-        label: Link
-        widget: string
-        hint: A full web address, or type order for the online-ordering link, or directions for Google Maps directions.
-      - name: outline
-        label: Outline style
-        widget: boolean
-        default: false
-      summary: '{{fields.label}}'
-    - name: address_label
-      label: Address label
-      widget: string
-    - name: copy_label
-      label: Copy button
-      widget: string
-    - name: copied_label
-      label: Copy button after copying
-      widget: string
-    - name: hours_label
-      label: Hours label
-      widget: string
-    - name: phone_label
-      label: Phone label
-      widget: string
-    - name: instagram_label
-      label: Instagram label
-      widget: string
-    - name: map_label
-      label: Map description (screen readers)
-      widget: string
-  - name: footer
-    label: Credit & 404 page
-    file: src/_data/footer.json
-    fields:
-    - name: credit_label
-      label: Site credit text (bottom right)
-      widget: string
-      required: false
-    - name: credit_url
-      label: Site credit link
-      widget: string
-      required: false
-    - name: notfound_heading
-      label: 404 heading
-      widget: string
-    - name: notfound_italic
-      label: 404 heading, italic end
-      widget: string
-    - name: notfound_text
-      label: 404 text
-      widget: string
-    - name: notfound_button
-      label: 404 button
-      widget: string
+          - { label: Show the notice, name: show, widget: boolean, default: false, hint: "Puts a big notice across the top of the site and above the hours, with the time you reopen. It comes down by itself once that time passes." }
+          - { label: Closed from, name: starts, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Leave empty if you're closed right now. Set it to post a heads-up ahead of time." }
+          - { label: Back open at, name: reopens, widget: datetime, required: false, format: "YYYY-MM-DDTHH:mm", date_format: "MMM D, YYYY", time_format: "h:mm a", picker_utc: false, hint: "Needed when the notice is on. Cary time." }
+          - { label: Headline, name: headline, widget: string, default: "closed for a private event" }
+          - { label: Extra line, name: message, widget: string, required: false, hint: "e.g. want the place to yourself? email us." }
+
+      # ───────────────────────── HOURS
+      - name: hours
+        label: Hours
+        file: content/hours.json
+        format: json
+        fields:
+          - label: Open days
+            name: days
+            widget: list
+            summary: "{{fields.day}}: {{fields.open}} – {{fields.close}}"
+            hint: Only list the days you're open. Any day not listed shows as closed. Write times like 4pm, 12am or 11:30pm.
+            fields:
+              - { label: Day, name: day, widget: select, options: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday] }
+              - { label: Opens, name: open, widget: string, pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 4pm or 4:30pm'] }
+              - { label: Closes, name: close, widget: string, pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 12am or 11pm'] }
+          - { label: Small note under the hours, name: note, widget: string, required: false }
+
+      # ───────────────────────── MENU
+      - name: menu
+        label: Menu
+        file: content/menu.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: string }
+          - { label: Search box placeholder, name: search_placeholder, widget: string }
+          - { label: Message when a search finds nothing, name: empty_message, widget: string }
+          - label: Menu sections
+            name: categories
+            widget: list
+            summary: "{{fields.title}}"
+            hint: Drag sections to reorder them on the page.
+            fields:
+              - { label: Section title, name: title, widget: string }
+              - label: Filter button it belongs to
+                name: filter
+                widget: select
+                options:
+                  - { label: specials, value: specials }
+                  - { label: cocktails, value: cocktails }
+                  - { label: beer, value: beer }
+                  - { label: shots, value: shots }
+                  - { label: zero proof, value: zero }
+                  - { label: wine, value: wine }
+                  - { label: food, value: food }
+              - { label: Price next to the title, name: price_tag, widget: string, required: false, hint: "For sections where everything costs the same, like 5" }
+              - label: Color
+                name: color
+                widget: select
+                options: [yellow, pink, blue, orange, lavender, mint]
+              - { label: Highlighted note, name: note, widget: string, required: false, hint: "Shows in a yellow band under the title, like: make it a pitcher! 18" }
+              - label: Items
+                name: items
+                widget: list
+                summary: "{{fields.name}} {{fields.price}}"
+                fields:
+                  - { label: Name, name: name, widget: string }
+                  - { label: Price, name: price, widget: string, required: false, hint: "Just the number, like 10. Leave blank if it's covered by the section." }
+                  - { label: Description, name: description, widget: string, required: false }
+
+      # ───────────────────────── EVENTS
+      - name: events
+        label: Events
+        file: content/events.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: string }
+          - label: Event cards
+            name: items
+            widget: list
+            summary: "{{fields.title}}"
+            hint: Remove every card to hide the events section.
+            fields:
+              - { label: Small label, name: label, widget: string, required: false, hint: "Like: every saturday" }
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: body, widget: text, required: false }
+              - { label: Show this month's music flyer on this card, name: show_flyer, widget: boolean, default: false, required: false, hint: "Turn on for the live music card. The flyer and its shows come from Music flyers." }
+              - { label: Button text, name: button_text, widget: string, required: false }
+              - { label: Button link, name: button_link, widget: string, required: false, hint: "A web address, or mailto:someone@email.com" }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+
+      # ───────────────────────── MUSIC FLYERS
+      - name: flyers
+        label: Music flyers
+        file: content/flyers.json
+        format: json
+        fields:
+          - label: Flyers
+            name: flyers
+            widget: list
+            label_singular: flyer
+            summary: "{{fields.title}} ({{fields.month}})"
+            hint: "Add next month's flyer any time. The site shows this month's flyer, switches to the next one once this month's shows are done, and never shows an old month."
+            fields:
+              - { label: Month, name: month, widget: datetime, format: "YYYY-MM", date_format: "MMMM YYYY", time_format: false, picker_utc: true, hint: "Pick any day in the month the flyer is for." }
+              - { label: Flyer, name: image, widget: image, choose_url: false, hint: "The same image you post on Instagram." }
+              - { label: Heading, name: title, widget: string, hint: "Like: november music" }
+              - { label: Music starts, name: starts, widget: string, default: "7pm", pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 7pm or 7:30pm'] }
+              - { label: Music ends, name: ends, widget: string, default: "10pm", required: false, pattern: ['^\s*\d{1,2}(:\d{2})?\s*[aApP]\.?[mM]\.?\s*$', 'Write it like 10pm'] }
+              - label: Shows
+                name: shows
+                widget: list
+                label_singular: show
+                required: false
+                summary: "{{fields.date}} · {{fields.artist}}"
+                hint: "Optional. With just the flyer, the flyer shows on its own. Type the shows too and they list on the page, past ones cross out, the next one is marked, and Google can list them as events."
+                fields:
+                  - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "MMM D, YYYY", time_format: false, picker_utc: true }
+                  - { label: Who's playing, name: artist, widget: string }
+                  - { label: Style, name: genre, widget: string, required: false, hint: "Like: pop/rock hits" }
+
+      # ───────────────────────── PRIVATE EVENTS PAGE (events.html)
+      - name: private_events
+        label: Private events page
+        file: content/private-events.json
+        format: json
+        fields:
+          - { label: Small label at the top, name: eyebrow, widget: string }
+          - { label: Headline, name: heading, widget: text, hint: "A line break here shows as a line break on the page." }
+          - { label: Intro, name: intro, widget: text }
+          - { label: Top photo, name: hero_image, widget: image, choose_url: false }
+          - { label: Top photo description (for screen readers), name: hero_alt, widget: string }
+          - { label: Space heading, name: space_heading, widget: string }
+          - { label: Space note, name: space_note, widget: text }
+          - label: Photos of the space
+            name: photos
+            widget: list
+            summary: "{{fields.caption}}"
+            hint: Five fills the grid. The first one shows biggest.
+            fields:
+              - { label: Photo, name: image, widget: image, choose_url: false }
+              - { label: Caption, name: caption, widget: string }
+              - { label: Description for screen readers, name: alt, widget: string }
+          - { label: Criteria heading, name: criteria_heading, widget: string }
+          - label: Criteria
+            name: criteria
+            widget: list
+            summary: "{{fields.title}}"
+            hint: What makes a good event here. Six fills the grid.
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: body, widget: text }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+          - { label: Steps heading, name: steps_heading, widget: string }
+          - label: Steps
+            name: steps
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Text, name: body, widget: text }
+          - { label: Form heading, name: form_heading, widget: string }
+          - { label: Text next to the form, name: form_intro, widget: text }
+          - { label: Thank-you heading, name: thanks_heading, widget: string }
+          - { label: Thank-you text, name: thanks_body, widget: text }
+
+      # ───────────────────────── PHOTOS
+      - name: photos
+        label: Photos
+        file: content/photos.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: text, hint: "A line break here shows as a line break on the page." }
+          - label: Photos
+            name: items
+            widget: list
+            summary: "{{fields.caption}}"
+            hint: Five looks best. Square photos at least 900px wide.
+            fields:
+              - { label: Photo, name: image, widget: image, choose_url: false }
+              - { label: Caption, name: caption, widget: string }
+              - { label: Description for screen readers, name: alt, widget: string, hint: "What's in the photo, in a sentence." }
+
+      # ───────────────────────── REVIEWS
+      - name: reviews
+        label: Reviews
+        file: content/reviews.json
+        format: json
+        fields:
+          - { label: Heading, name: heading, widget: text }
+          - { label: Star rating, name: rating, widget: number, value_type: float, min: 0, max: 5, step: 0.1 }
+          - { label: Number of reviews, name: count, widget: number, value_type: int, min: 0 }
+          - { label: Where the reviews are, name: source, widget: string }
+          - { label: Link to the reviews, name: reviews_link, widget: string }
+          - { label: Tags, name: tags, widget: list, field: { label: Tag, name: tag, widget: string } }
+          - label: Quotes
+            name: quotes
+            widget: list
+            summary: "{{fields.who}}"
+            hint: Keep them short and word-for-word from the review.
+            fields:
+              - { label: Quote, name: text, widget: text }
+              - { label: Who said it, name: who, widget: string, hint: "Like: sherie g. · google" }
+              - { label: Color, name: color, widget: select, options: [yellow, pink, blue, orange, lavender, mint] }
+
+      # ───────────────────────── EVERYTHING ELSE
+      - name: general
+        label: Contact, hero & the rest
+        file: content/general.json
+        format: json
+        fields:
+          - label: Contact
+            name: contact
+            widget: object
+            fields:
+              - { label: Street, name: street, widget: string }
+              - { label: Address note, name: address_note, widget: string, required: false }
+              - { label: City, name: city, widget: string }
+              - { label: State, name: state, widget: string }
+              - { label: ZIP, name: zip, widget: string }
+              - { label: Phone, name: phone, widget: string }
+              - { label: Email, name: email, widget: string }
+              - { label: Instagram handle (no @), name: instagram, widget: string }
+              - { label: Directions link, name: directions_url, widget: string }
+          - label: Top of the page
+            name: hero
+            widget: object
+            fields:
+              - { label: Background photo, name: image, widget: image, choose_url: false }
+              - { label: Headline line 1, name: line_1, widget: string }
+              - { label: Headline line 2 (the smiley follows it), name: line_2, widget: string }
+              - { label: Top-left label, name: topline_left, widget: string }
+              - { label: Top-left extra (hidden on small phones), name: topline_left_extra, widget: string, required: false }
+              - { label: Top-right label, name: topline_right, widget: string }
+              - { label: Top-right extra (hidden on phones), name: topline_right_extra, widget: string, required: false }
+              - { label: Menu button, name: menu_button, widget: string }
+              - { label: Hours button, name: visit_button, widget: string }
+          - label: Storefront photo (in the hours and location section)
+            name: visit
+            widget: object
+            fields:
+              - { label: Photo, name: image, widget: image, choose_url: false, required: false, hint: "Leave empty to hide it." }
+              - { label: Caption, name: caption, widget: string, required: false }
+              - { label: Description for screen readers, name: alt, widget: string, required: false }
+          - label: Email signup
+            name: newsletter
+            widget: object
+            fields:
+              - { label: Heading, name: heading, widget: text }
+              - { label: Text, name: body, widget: string }
+              - { label: Email box placeholder, name: placeholder, widget: string }
+              - { label: Button, name: button, widget: string }
+              - { label: Thank-you message, name: thanks, widget: string }
+          - label: Footer
+            name: footer
+            widget: object
+            fields:
+              - { label: Footer note, name: note, widget: string }

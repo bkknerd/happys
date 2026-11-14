@@ -1,6 +1,4 @@
 User-agent: *
-Allow: /
 Disallow: /admin/
 
-Sitemap: https://miloseuropeancafe.com/sitemap.xml
-
+Sitemap: https://happysnc.com/sitemap.xml
