@@ -136,7 +136,7 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
       <p class="mono">rather email? <a data-mail href="mailto:thewalkupcary@gmail.com"><span data-t="g.contact.email">thewalkupcary@gmail.com</span></a></p>
     </aside>
     <div>
-      <form class="pe-form" id="pe-form" name="event-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <form class="pe-form" id="pe-form" name="event-inquiry" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" novalidate>
         <input type="hidden" name="form-name" value="event-inquiry">
         <p hidden><label>leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
 
@@ -245,12 +245,35 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
 
   /* send to Netlify Forms without leaving the page */
   var form=$('#pe-form'),err=$('#pe-err');
+  var NAMES={name:'your name',email:'your email',occasion:'the occasion',date:'the date you want',time:'a rough time',guests:'how many people',space:'how much of the bar',details:'a few details',all_21_plus:'the 21+ box'};
+  function say(m){err.textContent=m;err.hidden=false}
   form.addEventListener('submit',function(e){
     e.preventDefault();err.hidden=true;
+    /* the pill choices hide their real inputs, and some phones block a send without saying why: list what's missing instead */
+    if(!form.checkValidity()){
+      var bad=[],seen={},first=null;
+      Array.prototype.forEach.call(form.elements,function(el){
+        if(el.willValidate&&!el.checkValidity()&&!seen[el.name]){seen[el.name]=1;bad.push(NAMES[el.name]||el.name);first=first||el}
+      });
+      say('almost there. still need: '+bad.join(', ')+'.');
+      if(first){(first.type==='radio'?first.closest('fieldset'):first).scrollIntoView({block:'center',behavior:'smooth'});try{first.focus({preventScroll:true})}catch(x){}}
+      return;
+    }
     var bt=form.querySelector('button');bt.disabled=true;bt.textContent='sending…';
     fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form)).toString()})
-      .then(function(r){if(!r.ok)throw 0;form.hidden=true;var th=$('#pe-thanks');th.hidden=false;th.focus()})
-      .catch(function(){bt.disabled=false;bt.textContent='send it';err.textContent='that didn’t go through. try again, or email us instead.';err.hidden=false});
+      .then(function(r){
+        if(!r.ok){var x=new Error('status '+r.status);x.status=r.status;throw x}
+        form.hidden=true;var th=$('#pe-thanks');th.hidden=false;th.focus();
+      })
+      .catch(function(x){
+        console.warn('[happys] event inquiry did not send:',x&&x.message);
+        if(!x||!x.status){
+          /* the background send was blocked (network, extension): fall back to a normal form post, which Netlify also accepts */
+          HTMLFormElement.prototype.submit.call(form);return;
+        }
+        bt.disabled=false;bt.textContent='send it';
+        say('that didn’t go through (error '+x.status+'). try again in a minute, or email us instead.');
+      });
   });
 })();
 </script>
