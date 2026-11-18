@@ -9,7 +9,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'dist');
-const SKIP = new Set(['dist', 'node_modules', 'scripts', '.git', '.netlify', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'netlify.toml']);
+const SKIP = new Set(['dist', 'analytics', 'node_modules', 'scripts', '.git', '.netlify', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'netlify.toml']);
 const SITE = 'https://happysnc.com/';
 
 await rm(out, { recursive: true, force: true });
@@ -77,49 +77,59 @@ for (const page of PAGES) {
   report.push(`${page.file} ${(outHtml.length / 1024).toFixed(0)} KB`);
 }
 
-// 4. Google Analytics: on only when content/general.json has analytics.ga4_id (set at /admin → Contact, hero & the rest).
+// 4. Analytics: Google Tag Manager or GA4, set at /admin → Contact, hero & the rest → Analytics.
+// With a GTM container, GA4 lives inside GTM (import analytics/gtm-happys.json there) so nothing is counted twice.
 const general = JSON.parse(await readFile(join(root, 'content', 'general.json'), 'utf8'));
+const GTM = String(general.analytics?.gtm_id || '').trim();
 const GA = String(general.analytics?.ga4_id || '').trim();
+if (GTM && !/^GTM-[A-Z0-9]+$/.test(GTM)) throw new Error(`content/general.json: "${GTM}" is not a Tag Manager ID (it should look like GTM-AB12CD3)`);
 if (GA && !/^G-[A-Z0-9]+$/.test(GA)) throw new Error(`content/general.json: "${GA}" is not a GA4 Measurement ID (it should look like G-AB12CD34EF)`);
-if (GA) {
+if (GTM || GA) {
   // Page views and enhanced measurement come from GA itself. The listener adds the actions that matter for a bar:
   // calls, directions, Instagram, email, event-booking clicks, menu filters, sign-ups, event inquiries, and which sections get seen.
-  const tag = `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA}"></script>
+  // With GTM each one is a dataLayer event ({event:'call_click', ...}); with GA4 alone it goes straight to gtag.
+  const loader = GTM
+    ? `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM}');</script>
+<script>function hpEv(n,p){var o={event:n};for(var k in p||{})o[k]=p[k];window.dataLayer.push(o)}</script>`
+    : `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA}');
+function hpEv(n,p){gtag('event',n,p||{})}</script>`;
+  const tag = `${loader}
 <script>
-window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
-gtag('js',new Date());gtag('config','${GA}');
 (function(){
-  function ev(n,p){try{gtag('event',n,p||{})}catch(e){}}
+  function send(n,p){try{hpEv(n,p)}catch(e){}}
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a,button');if(!a)return;
     var h=a.getAttribute('href')||'';
-    if(h.indexOf('tel:')===0)ev('call_click',{link_url:h});
-    else if(h.indexOf('mailto:')===0)ev('email_click');
-    else if(a.hasAttribute('data-maps')||/google\\.[^/]+\\/maps/.test(h))ev('get_directions');
-    else if(h.indexOf('instagram.com')>-1)ev('instagram_click');
-    else if(/events\\.html/.test(h))ev('book_event_click',{link_text:(a.textContent||'').trim().slice(0,60)});
-    else if(a.closest('#chips'))ev('menu_filter',{category:(a.textContent||'').trim().toLowerCase()});
+    if(h.indexOf('tel:')===0)send('call_click',{link_url:h});
+    else if(h.indexOf('mailto:')===0)send('email_click');
+    else if(a.hasAttribute('data-maps')||/google\\.[^/]+\\/maps/.test(h))send('get_directions');
+    else if(h.indexOf('instagram.com')>-1)send('instagram_click');
+    else if(/events\\.html/.test(h))send('book_event_click',{link_text:(a.textContent||'').trim().slice(0,60)});
+    else if(a.closest('#chips'))send('menu_filter',{category:(a.textContent||'').trim().toLowerCase()});
   },true);
   document.addEventListener('submit',function(e){
     var f=e.target,n=f.getAttribute('name');
-    if(n==='newsletter')ev('sign_up',{method:'newsletter'});
-    else if(n==='event-inquiry'&&(!f.checkValidity||f.checkValidity()))ev('generate_lead',{form_name:'event-inquiry'});
+    if(n==='newsletter')send('sign_up',{method:'newsletter'});
+    else if(n==='event-inquiry'&&(!f.checkValidity||f.checkValidity()))send('generate_lead',{form_name:'event-inquiry'});
   },true);
   function watch(){if(!('IntersectionObserver' in window))return;
-    var seen={},io=new IntersectionObserver(function(es){es.forEach(function(x){var id=x.target.id;if(x.isIntersecting&&!seen[id]){seen[id]=1;ev('view_section',{section:id});io.unobserve(x.target)}})},{rootMargin:'0px 0px -40% 0px'});
+    var seen={},io=new IntersectionObserver(function(es){es.forEach(function(x){var id=x.target.id;if(x.isIntersecting&&!seen[id]){seen[id]=1;send('view_section',{section:id});io.unobserve(x.target)}})},{rootMargin:'0px 0px -40% 0px'});
     ['menu','events','reviews','visit'].forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el)});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
 })();
 </script>
 `;
+  const noscript = GTM ? `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${GTM}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>\n` : '';
   for (const file of ['index.html', 'events.html', '404.html']) {
     const p = join(out, file);
     let html = await readFile(p, 'utf8');
     html = html.replace(/<head>\s*/i, (m) => m + tag);
+    if (noscript) html = html.replace(/<body[^>]*>\s*/i, (m) => m + noscript);
     await writeFile(p, html);
   }
-  report.push('GA ' + GA);
+  report.push(GTM ? 'GTM ' + GTM : 'GA ' + GA);
 }
 
 console.log('built dist/: ' + report.join(', '));

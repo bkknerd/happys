@@ -250,12 +250,13 @@ collections:
         file: content/general.json
         format: json
         fields:
-          - label: Google Analytics
+          - label: Analytics
             name: analytics
             widget: object
             collapsed: true
             fields:
-              - { label: GA4 Measurement ID, name: ga4_id, widget: string, required: false, pattern: ["^(G-[A-Z0-9]+)?$", "Starts with G-, like G-AB12CD34EF"], hint: "From Google Analytics → Admin → Data streams → happysnc.com. Leave empty to turn tracking off." }
+              - { label: Google Tag Manager container ID, name: gtm_id, widget: string, required: false, pattern: ["^(GTM-[A-Z0-9]+)?$", "Starts with GTM-, like GTM-AB12CD3"], hint: "From tagmanager.google.com. When this is set, GA4 is set up inside Tag Manager." }
+              - { label: GA4 Measurement ID (only if not using Tag Manager), name: ga4_id, widget: string, required: false, pattern: ["^(G-[A-Z0-9]+)?$", "Starts with G-, like G-AB12CD34EF"], hint: "Leave empty when the Tag Manager ID is set." }
           - label: Contact
             name: contact
             widget: object
