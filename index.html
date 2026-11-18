@@ -4,17 +4,36 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="happy’s is a cocktail bar and event space at 126 W Chatham St in downtown Cary, NC. House cocktails, draft beer, jello shots, hot dogs and pizza. Live music every Saturday, private events, walk-ins only, 21+.">
+<title>happy’s | Cocktail Bar &amp; Live Music in Downtown Cary, NC</title>
+<meta name="description" content="Downtown Cary’s cocktail bar at 126 W Chatham St. House cocktails, $5.50 drafts, jello shots, hot dogs and pizza, live music every Saturday and private events. 21+.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <link rel="canonical" href="https://happysnc.com/">
+<meta name="geo.region" content="US-NC">
+<meta name="geo.placename" content="Cary, North Carolina">
+<meta name="author" content="happy’s">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="happy’s">
+<meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://happysnc.com/">
-<meta property="og:title" content="happy’s · downtown Cary’s cocktail bar">
-<meta property="og:description" content="come by. feel good. House cocktails, draft beer and hot snacks at 126 W Chatham St, Cary NC.">
+<meta property="og:title" content="happy’s · cocktail bar in downtown Cary, NC">
+<meta property="og:description" content="come by. feel good. House cocktails, cold drafts, hot snacks and live music every Saturday at 126 W Chatham St, Cary NC.">
+<meta property="og:image" content="https://happysnc.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The white brick front of happy’s on West Chatham Street in downtown Cary, NC">
+<meta property="business:contact_data:street_address" content="126 W Chatham St #200">
+<meta property="business:contact_data:locality" content="Cary">
+<meta property="business:contact_data:region" content="NC">
+<meta property="business:contact_data:postal_code" content="27511">
+<meta property="business:contact_data:country_name" content="United States">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="happy’s · cocktail bar in downtown Cary, NC">
+<meta name="twitter:description" content="House cocktails, cold drafts, hot snacks and live music every Saturday at 126 W Chatham St, Cary NC.">
+<meta name="twitter:image" content="https://happysnc.com/og-image.jpg">
+<meta name="twitter:image:alt" content="The white brick front of happy’s on West Chatham Street in downtown Cary, NC">
 <meta name="theme-color" content="#f6ead6">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>happy’s | downtown Cary’s cocktail bar and event space</title>
 <link rel="preload" href="content/general.json" as="fetch" crossorigin>
 <link rel="preload" href="content/hours.json" as="fetch" crossorigin>
 <link rel="preload" href="content/menu.json" as="fetch" crossorigin>
@@ -25,6 +44,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Hanken+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
+<script id="ld-site" type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://happysnc.com/#website","url":"https://happysnc.com/","name":"happy’s","alternateName":["Happy's Cary","Happy's Bar Cary NC"],"inLanguage":"en-US","publisher":{"@id":"https://happysnc.com/#bar"}},{"@type":"WebPage","@id":"https://happysnc.com/#webpage","url":"https://happysnc.com/","name":"happy’s | Cocktail Bar & Live Music in Downtown Cary, NC","isPartOf":{"@id":"https://happysnc.com/#website"},"about":{"@id":"https://happysnc.com/#bar"},"primaryImageOfPage":"https://happysnc.com/og-image.jpg","inLanguage":"en-US"}]}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -371,8 +391,18 @@
     var t0=new Date().toISOString().slice(0,10),evs=[];
     function off(day){try{var z=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',timeZoneName:'longOffset'}).formatToParts(new Date(day+'T12:00:00Z')).filter(function(p){return p.type==='timeZoneName'})[0].value.replace('GMT','');return z||'+00:00'}catch(e){return ''}}
     function at(day,t,closing){var h=hrs(t,closing);if(h==null)return day;var d=day;if(h>=24){h-=24;var n=new Date(day+'T12:00:00Z');n.setUTCDate(n.getUTCDate()+1);d=n.toISOString().slice(0,10)}return d+'T'+hm(h)+':00'+off(day)}
-    (C.flyers||[]).forEach(function(f){(f.shows||[]).forEach(function(r){if(r&&r.artist&&r.date&&String(r.date).slice(0,10)>=t0){var day=String(r.date).slice(0,10),o={"@type":"MusicEvent",name:r.artist+' at happy’s',startDate:at(day,f.starts),eventAttendanceMode:"https://schema.org/OfflineEventAttendanceMode",eventStatus:"https://schema.org/EventScheduled",location:{"@type":"BarOrPub",name:"happy’s",address:ld.address},performer:{"@type":"PerformingGroup",name:r.artist}};if(f.ends&&hrs(f.ends)!=null)o.endDate=at(day,f.ends,true);if(f.image)o.image=new URL(f.image,location.href).href;evs.push(o)}})});
+    (C.flyers||[]).forEach(function(f){(f.shows||[]).forEach(function(r){if(r&&r.artist&&r.date&&String(r.date).slice(0,10)>=t0){var day=String(r.date).slice(0,10),o={"@type":"MusicEvent",name:r.artist+' at happy’s',startDate:at(day,f.starts),eventAttendanceMode:"https://schema.org/OfflineEventAttendanceMode",eventStatus:"https://schema.org/EventScheduled",location:{"@type":"BarOrPub",name:"happy’s",address:ld.address},performer:{"@type":"PerformingGroup",name:r.artist}};if(f.ends&&hrs(f.ends)!=null)o.endDate=at(day,f.ends,true);var im=f.image?new URL(f.image,location.href).href:'';o.image=(im&&im.indexOf('data:')!==0)?im:location.origin+'/og-image.jpg';o.location['@id']=location.origin+'/#bar';o.organizer={'@id':location.origin+'/#bar','@type':'BarOrPub',name:'happy’s',url:location.origin+'/'};o.description='Live music every Saturday night at happy’s, downtown '+ct.city+'’s cocktail bar. 21+, walk-ins only.';evs.push(o)}})});
     if(evs.length)ld.event=evs;
+    /* SEO enrichment: keep in step with the static #ld in <head> */
+    var O=location.origin+'/';ld['@id']=O+'#bar';
+    ld.description='happy’s is a cocktail bar and event space in downtown '+ct.city+', '+ct.state+', with house cocktails, draft beer, jello shots, hot dogs and personal pizza, live music every Saturday night, a patio and private event bookings. Walk-ins only, 21+.';
+    ld.image=[O+'og-image.jpg',O+'happys-front-4x3.jpg',O+'happys-wall-1x1.jpg'];ld.logo=O+'favicon.svg';
+    ld.priceRange='$10–20';ld.currenciesAccepted='USD';ld.servesCuisine=['Cocktails','Bar food','Hot dogs','Pizza'];ld.hasMenu=O+'#menu';
+    ld.hasMap='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(ct.street+' '+ct.city+' '+ct.state+' '+ct.zip);
+    ld.areaServed=[{'@type':'City',name:'Cary, NC'},{'@type':'Place',name:'Downtown Cary'},{'@type':'City',name:'Apex, NC'},{'@type':'City',name:'Morrisville, NC'},{'@type':'City',name:'Raleigh, NC'}];
+    ld.keywords='cocktail bar Cary NC, bar in downtown Cary, best bars in Cary, live music Cary NC, private event space Cary, happy hour Cary, craft cocktails Cary, bar with patio Cary, sports bar Cary, espresso martini Cary';
+    ld.amenityFeature=['Outdoor seating','Live music','Private events','TVs for games','Walk-ins only'].map(function(n){return {'@type':'LocationFeatureSpecification',name:n,value:true}});
+    ld.publicAccess=true;ld.smokingAllowed=false;
     var old=document.getElementById('ld');if(old)old.remove();
     var sc=document.createElement('script');sc.id='ld';sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc);
   }

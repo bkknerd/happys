@@ -35,5 +35,8 @@
   "image": "images/uploads/storefront.webp",
   "caption": "126 w chatham. the black door, ground floor.",
   "alt": "The white brick front of happy’s on West Chatham Street, a black door with the happy’s logo and must be 21+"
+ },
+ "analytics": {
+  "ga4_id": ""
  }
 }

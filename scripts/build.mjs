@@ -77,4 +77,49 @@ for (const page of PAGES) {
   report.push(`${page.file} ${(outHtml.length / 1024).toFixed(0)} KB`);
 }
 
+// 4. Google Analytics: on only when content/general.json has analytics.ga4_id (set at /admin → Contact, hero & the rest).
+const general = JSON.parse(await readFile(join(root, 'content', 'general.json'), 'utf8'));
+const GA = String(general.analytics?.ga4_id || '').trim();
+if (GA && !/^G-[A-Z0-9]+$/.test(GA)) throw new Error(`content/general.json: "${GA}" is not a GA4 Measurement ID (it should look like G-AB12CD34EF)`);
+if (GA) {
+  // Page views and enhanced measurement come from GA itself. The listener adds the actions that matter for a bar:
+  // calls, directions, Instagram, email, event-booking clicks, menu filters, sign-ups, event inquiries, and which sections get seen.
+  const tag = `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA}"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('js',new Date());gtag('config','${GA}');
+(function(){
+  function ev(n,p){try{gtag('event',n,p||{})}catch(e){}}
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a,button');if(!a)return;
+    var h=a.getAttribute('href')||'';
+    if(h.indexOf('tel:')===0)ev('call_click',{link_url:h});
+    else if(h.indexOf('mailto:')===0)ev('email_click');
+    else if(a.hasAttribute('data-maps')||/google\\.[^/]+\\/maps/.test(h))ev('get_directions');
+    else if(h.indexOf('instagram.com')>-1)ev('instagram_click');
+    else if(/events\\.html/.test(h))ev('book_event_click',{link_text:(a.textContent||'').trim().slice(0,60)});
+    else if(a.closest('#chips'))ev('menu_filter',{category:(a.textContent||'').trim().toLowerCase()});
+  },true);
+  document.addEventListener('submit',function(e){
+    var f=e.target,n=f.getAttribute('name');
+    if(n==='newsletter')ev('sign_up',{method:'newsletter'});
+    else if(n==='event-inquiry'&&(!f.checkValidity||f.checkValidity()))ev('generate_lead',{form_name:'event-inquiry'});
+  },true);
+  function watch(){if(!('IntersectionObserver' in window))return;
+    var seen={},io=new IntersectionObserver(function(es){es.forEach(function(x){var id=x.target.id;if(x.isIntersecting&&!seen[id]){seen[id]=1;ev('view_section',{section:id});io.unobserve(x.target)}})},{rootMargin:'0px 0px -40% 0px'});
+    ['menu','events','reviews','visit'].forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el)});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
+})();
+</script>
+`;
+  for (const file of ['index.html', 'events.html', '404.html']) {
+    const p = join(out, file);
+    let html = await readFile(p, 'utf8');
+    html = html.replace(/<head>\s*/i, (m) => m + tag);
+    await writeFile(p, html);
+  }
+  report.push('GA ' + GA);
+}
+
 console.log('built dist/: ' + report.join(', '));

@@ -250,6 +250,12 @@ collections:
         file: content/general.json
         format: json
         fields:
+          - label: Google Analytics
+            name: analytics
+            widget: object
+            collapsed: true
+            fields:
+              - { label: GA4 Measurement ID, name: ga4_id, widget: string, required: false, pattern: ["^(G-[A-Z0-9]+)?$", "Starts with G-, like G-AB12CD34EF"], hint: "From Google Analytics → Admin → Data streams → happysnc.com. Leave empty to turn tracking off." }
           - label: Contact
             name: contact
             widget: object
