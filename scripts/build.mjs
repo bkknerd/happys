@@ -78,7 +78,7 @@ for (const page of PAGES) {
 }
 
 // 4. Analytics: Google Tag Manager or GA4, set at /admin → Contact, hero & the rest → Analytics.
-// With a GTM container, GA4 lives inside GTM (import analytics/gtm-happys.json there) so nothing is counted twice.
+// With a GTM container, GA4 lives inside GTM so nothing is counted twice.
 const general = JSON.parse(await readFile(join(root, 'content', 'general.json'), 'utf8'));
 const GTM = String(general.analytics?.gtm_id || '').trim();
 const GA = String(general.analytics?.ga4_id || '').trim();
