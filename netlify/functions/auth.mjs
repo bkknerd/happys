@@ -30,15 +30,15 @@ const page = (body) => `<!doctype html>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Hanken+Grotesk:wght@500;700&display=swap");
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f6ead6;color:#1d1410;font:500 16px/1.5 "Hanken Grotesk","Helvetica Neue",Arial,sans-serif;padding:24px}
-form,.box{width:100%;max-width:340px;background:#fff6e6;border:1.5px solid #1d1410;border-radius:16px;box-shadow:5px 5px 0 #1d1410;padding:24px}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#000;color:#fff;font:500 16px/1.5 "Hanken Grotesk","Helvetica Neue",Arial,sans-serif;padding:24px}
+form,.box{width:100%;max-width:340px;background:#000;border:1.5px solid #fff;border-radius:16px;box-shadow:5px 5px 0 #f5c518;padding:24px}
 h1{font:800 34px/.95 "Bricolage Grotesque","Arial Black",sans-serif;letter-spacing:-.04em;text-transform:lowercase;margin:0 0 16px}
 label{display:block;font-weight:700;margin-bottom:6px}
-input{width:100%;font:inherit;padding:11px 12px;border:1.5px solid #1d1410;border-radius:10px;background:#fff}
+input{width:100%;font:inherit;padding:11px 12px;border:1.5px solid #fff;border-radius:10px;background:#fff;color:#000}
 input:focus{outline:3px solid #e8472b;outline-offset:2px}
 button{margin-top:14px;width:100%;font:700 16px "Hanken Grotesk",sans-serif;padding:12px;border:1.5px solid #1d1410;border-radius:99px;background:#f5c518;color:#1d1410;cursor:pointer}
-button:hover{background:#1d1410;color:#f6ead6}
-.err{color:#b3261e;font-weight:700;margin:0 0 12px}
+button:hover{background:#fff;color:#000}
+.err{color:#ff8a7a;font-weight:700;margin:0 0 12px}
 p{margin:0}
 </style></head><body>${body}</body></html>`;
 
