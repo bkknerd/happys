@@ -5,8 +5,9 @@ backend:
   name: github
   repo: bkknerd/happys
   branch: main
-  # Sign-in goes through Netlify's GitHub OAuth (Site settings → Access & security → OAuth → GitHub).
-  # Hosting somewhere else? Point base_url at your own OAuth proxy instead.
+  # Sign-in is the shared staff password at /admin/auth (netlify/functions/auth.mjs).
+  # admin/index.html sets base_url to the current address, so it works on happysnc.com and the .netlify.app one.
+  auth_endpoint: admin/auth
 
 # Lets you test the editor on your machine: run `npx decap-server` in this folder, then open /admin.
 local_backend: true

@@ -4,6 +4,10 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  # Staff sign-in for /admin. Needs ADMIN_PASSWORD and GITHUB_TOKEN set in Netlify.
+  directory = "netlify/functions"
+
 [build.environment]
   NODE_VERSION = "20"
 

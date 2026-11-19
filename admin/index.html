@@ -8,6 +8,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
+  <!-- Started by hand (bottom of this file) so sign-in points at whichever address the editor is open on. -->
+  <script>window.CMS_MANUAL_INIT = true;</script>
   <script src="https://unpkg.com/decap-cms@3.17.3/dist/decap-cms.js"></script>
   <script>
   /* Previews: the right-hand pane shows the real page with your unsaved changes,
@@ -91,6 +93,19 @@
       render: function () { return h('div', { onClick: this.jump, dangerouslySetInnerHTML: { __html: this.state.html } }); }
     });
     CMS.registerWidget('happys-guide', Guide);
+
+    /* Staff sign in: the shared password page at /admin/auth (netlify/functions/auth.mjs).
+       Running the editor locally with `npx decap-server` still uses the local backend. */
+    CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'admin/auth' } } });
+
+    /* Decap's button says "Login with GitHub". Staff don't need GitHub, so say what it does. */
+    new MutationObserver(function () {
+      document.querySelectorAll('button').forEach(function (b) {
+        b.childNodes.forEach(function (n) {
+          if (n.nodeType === 3 && /Login with GitHub/i.test(n.nodeValue)) n.nodeValue = 'Staff sign in';
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
   })();
   </script>
 </body>

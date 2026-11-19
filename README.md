@@ -51,18 +51,21 @@ Open `admin/config.yml` and change `repo: OWNER/happys-site` to your real `user/
 - Spam is filtered with a hidden honeypot field.
 
 ### 5. CMS sign-in
-- On GitHub, go to **github.com/settings/developers → OAuth Apps → New OAuth App**. (That's your account settings: profile picture → Settings → Developer settings at the bottom of the sidebar. The repo's own Settings tab doesn't have it.)
-  - Homepage URL: `https://happysnc.com` (or the site's `.netlify.app` address until the domain moves)
-  - Authorization callback URL: `https://api.netlify.com/auth/done`
-- Copy the Client ID, then **Generate a new client secret** and copy it straight away (GitHub shows it once).
-- In Netlify, go to **Site configuration → Access & security → OAuth → Install provider → GitHub**, and paste the Client ID and Secret.
-- Test it at `https://YOUR-SITE.netlify.app/admin/` → **Login with GitHub**. The login only works on an address Netlify hosts for this site; until the domain moves, use the `.netlify.app` one.
+Staff sign in at `/admin` with one shared password. No GitHub account needed. The popup is `netlify/functions/auth.mjs`; on the right password it hands the editor a GitHub token so it can save.
+
+In Netlify, **Site configuration → Environment variables**, add:
+- `ADMIN_PASSWORD`: the staff password.
+- `GITHUB_TOKEN`: a fine-grained token from **github.com/settings/personal-access-tokens/new**. Repository access: only `bkknerd/happys`. Permissions: **Contents → Read and write** (Metadata read-only comes with it).
+
+Redeploy after adding them. To change the password, edit `ADMIN_PASSWORD` and redeploy. To lock everyone out, revoke the token on GitHub.
+
+Saves are committed as the token's owner. The password isn't in this repo because the repo is public; keep it that way.
 
 ### 6. Domain
 In Netlify, go to **Domain management → Add a domain** and add `happysnc.com`, then follow the DNS steps. HTTPS turns on by itself.
 
 ### 7. Give the owner access
-Add the owner's GitHub account as a collaborator on the repo. They sign in at `happysnc.com/admin` with **Login with GitHub**.
+Give staff the password. They sign in at `happysnc.com/admin` with **Staff sign in**.
 
 Each save in the CMS commits to the repo, and Netlify redeploys in under a minute.
 
@@ -72,7 +75,7 @@ The full owner guide is inside the CMS: **Start here: how to edit**, the first i
 
 The short version:
 
-1. Sign in at `/admin` with **Login with GitHub**.
+1. Sign in at `/admin` with **Staff sign in** and the staff password.
 2. Open **Site content** and pick a section.
 3. Change things. The preview on the right shows the real page with the unsaved changes, scrolled to the part being edited.
 4. **Publish → Publish now**. Netlify redeploys and the change is live in about a minute.
