@@ -1,7 +1,13 @@
 {
-  "show": true,
-  "starts": "2026-11-19T13:03",
-  "reopens": "2026-11-19T18:00",
-  "headline": "closed for a private event",
-  "message": ""
+ "show": true,
+ "kind": "private",
+ "theme": "classic",
+ "dates": [
+  {
+   "starts": "2026-11-19T13:03",
+   "reopens": "2026-11-19T18:00"
+  }
+ ],
+ "headline": "",
+ "message": ""
 }

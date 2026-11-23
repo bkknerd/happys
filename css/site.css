@@ -139,17 +139,31 @@ input[type=email]{flex:1 1 220px;font-family:inherit;font-size:17px;padding:14px
 @keyframes wink-lid{0%,14%{opacity:0}22%,66%{opacity:1}76%,100%{opacity:0}}
 @media(prefers-reduced-motion:reduce){.hero-smile.wink,.hero-smile.wink .eye-r,.hero-smile.wink .lid{animation:none}}
 
-/* private event closure notice (CMS: general → closure) */
-.closure{background:var(--accent);color:#fff6e6;border-bottom:1.5px solid var(--ink);padding:22px 5vw 24px;position:relative;z-index:21}
-.closure-in{display:flex;align-items:flex-end;justify-content:space-between;gap:18px 40px;flex-wrap:wrap;max-width:1400px}
+/* closed notice: private event or holiday, with a design per occasion (CMS: closed for a private event or holiday) */
+.closure{--cl-bg:var(--accent);--cl-fg:#fff6e6;--cl-when:#f5c518;--cl-when-fg:#1d1410;--cl-chip:rgba(255,246,230,.16);--cl-art:none;--cl-pat:none;background:var(--cl-bg) var(--cl-pat);color:var(--cl-fg);border-bottom:1.5px solid var(--ink);padding:22px 5vw 24px;position:relative;z-index:21;overflow:hidden}
+.closure::before{content:"";position:absolute;right:-28px;top:50%;width:190px;height:190px;transform:translateY(-50%) rotate(-12deg);background:var(--cl-art) center/contain no-repeat;opacity:.9;pointer-events:none}
+.closure-in{display:flex;align-items:flex-end;justify-content:space-between;gap:18px 40px;flex-wrap:wrap;max-width:1400px;position:relative;z-index:1}
 .closure-kick{display:block;font-size:12px;letter-spacing:.12em;margin-bottom:10px;opacity:.85}
 .closure-head{font-family:"Bricolage Grotesque","Arial Black",sans-serif;font-weight:800;text-transform:lowercase;letter-spacing:-.04em;line-height:.92;font-size:clamp(34px,5.4vw,72px);margin:0}
-.closure-when{font-family:"Bricolage Grotesque","Arial Black",sans-serif;font-weight:800;text-transform:lowercase;letter-spacing:-.03em;line-height:1;font-size:clamp(22px,2.8vw,36px);color:#1d1410;background:#f5c518;padding:10px 16px 12px;border:1.5px solid #1d1410;border-radius:4px;transform:rotate(-1.5deg);white-space:nowrap}
+.closure-when{font-family:"Bricolage Grotesque","Arial Black",sans-serif;font-weight:800;text-transform:lowercase;letter-spacing:-.03em;line-height:1;font-size:clamp(22px,2.8vw,36px);color:var(--cl-when-fg);background:var(--cl-when);padding:10px 16px 12px;border:1.5px solid #1d1410;border-radius:4px;transform:rotate(-1.5deg);white-space:nowrap}
+.closure-dates{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.closure-dates li{font-weight:700;font-size:15px;padding:6px 12px;border:1.5px solid currentColor;border-radius:4px;background:var(--cl-chip);text-transform:lowercase}
+.closure-dates li.now{background:var(--cl-when);color:var(--cl-when-fg);border-color:#1d1410}
+.closure-dates li .mono{font-size:11px;margin-left:6px}
 .closure-msg{margin:12px 0 0;font-size:16px;max-width:60ch}
 .closure-msg:empty{display:none}
+.closure-pv{position:relative;z-index:1;margin:14px 0 0;font-size:11px;opacity:.9}
+.closure.is-pv .closure-in{opacity:.55}
 .closure-note{margin:6px 0 16px;padding:12px 14px;border:1.5px solid var(--ink);background:var(--card);font-weight:700;font-size:16px}
 .closure-note b{color:var(--accent)}
-@media(max-width:600px){.closure{padding:18px 5vw 20px}.closure-when{white-space:normal}}
+.closure.t-thanksgiving{--cl-bg:#7a3210;--cl-fg:#fbe9cf;--cl-when:#f59a3d;--cl-chip:rgba(251,233,207,.12);--cl-art:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 4l7 17 13-9-2 17 18-3-10 15 16 7-17 8 6 14-17-4-4 18-10-13-10 13-4-18-17 4 6-14-17-8 16-7-10-15 18 3-2-17 13 9z' fill='%23f59a3d'/><path d='M50 30v66' stroke='%235a2408' stroke-width='4' stroke-linecap='round'/></svg>");--cl-pat:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><g fill='%23f59a3d' opacity='.16'><path d='M20 14c8 4 12 12 6 22-10-2-14-12-6-22z'/><path d='M84 60c10 0 16 8 12 18-10 2-16-6-12-18z'/><path d='M40 92c8-6 16-4 18 4-6 8-14 6-18-4z'/></g></svg>")}
+.closure.t-christmas{--cl-bg:#1f4d33;--cl-fg:#fff6e6;--cl-when:#d62839;--cl-when-fg:#fff6e6;--cl-chip:rgba(255,246,230,.12);--cl-art:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M48 50C40 36 30 30 10 32c6 4 4 10 10 12-6 2-4 9-10 12 18 2 30-2 38-6z' fill='%238fd0a0'/><path d='M52 50c8-14 18-20 38-18-6 4-4 10-10 12 6 2 4 9 10 12-18 2-30-2-38-6z' fill='%238fd0a0'/><circle cx='42' cy='62' r='8' fill='%23d62839'/><circle cx='58' cy='62' r='8' fill='%23d62839'/><circle cx='50' cy='74' r='8' fill='%23d62839'/></svg>");--cl-pat:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><g fill='%23fff6e6' opacity='.22'><circle cx='12' cy='18' r='2'/><circle cx='58' cy='8' r='1.4'/><circle cx='40' cy='46' r='2.4'/><circle cx='80' cy='38' r='1.6'/><circle cx='20' cy='74' r='1.4'/><circle cx='66' cy='72' r='2'/></g></svg>")}
+.closure.t-newyear{--cl-bg:#1d1410;--cl-fg:#f6ead6;--cl-when:#f5c518;--cl-chip:rgba(246,234,214,.1);--cl-art:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 0l9 37 37-9-29 22 29 22-37-9-9 37-9-37-37 9 29-22L4 28l37 9z' fill='%23f5c518'/></svg>");--cl-pat:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110'><g opacity='.5'><rect x='10' y='14' width='8' height='3' fill='%23f5c518' transform='rotate(30 14 15)'/><rect x='70' y='10' width='7' height='3' fill='%23f6a9d2' transform='rotate(-25 73 11)'/><rect x='44' y='50' width='8' height='3' fill='%235ba7e8' transform='rotate(60 48 51)'/><rect x='88' y='70' width='7' height='3' fill='%23f5c518' transform='rotate(-50 91 71)'/><rect x='18' y='86' width='8' height='3' fill='%23e8472b' transform='rotate(15 22 87)'/><circle cx='60' cy='92' r='2' fill='%23f5c518'/><circle cx='30' cy='44' r='1.6' fill='%23fff6e6'/></g></svg>")}
+.closure.t-newyear .closure-kick{color:#f5c518;opacity:1}
+.closure.t-wedding{--cl-bg:#fbeee6;--cl-fg:#1d1410;--cl-when:#fff;--cl-chip:#fff;--cl-art:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'><g fill='none' stroke-width='7'><circle cx='44' cy='56' r='30' stroke='%23c9567a'/><circle cx='76' cy='56' r='30' stroke='%23e6a94a'/></g><path d='M76 14l6 8-6 6-6-6z' fill='%23e6a94a'/></svg>");--cl-pat:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><circle cx='14' cy='14' r='1.4' fill='%23c9567a' opacity='.25'/></svg>");box-shadow:inset 0 -6px 0 #fbeee6,inset 0 -7.5px 0 #c9567a}
+.closure.t-wedding .closure-kick{color:#c9567a;opacity:1}
+.closure.t-wedding .closure-dates li{border-color:#1d1410}
+@media(max-width:600px){.closure{padding:18px 5vw 20px}.closure-when{white-space:normal}.closure::before{width:110px;height:110px;right:-30px;top:auto;bottom:-34px;transform:rotate(-12deg);opacity:.45}}
 
 /* inside the CMS preview pane: no scroll-in animation, so edits show straight away */
 .cms-preview .rv{opacity:1;transform:none;transition:none}

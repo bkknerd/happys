@@ -62,13 +62,15 @@
 
 <aside class="closure" id="closure" hidden aria-labelledby="closure-head">
   <div class="closure-in">
-    <div>
+    <div class="closure-main">
       <span class="closure-kick mono" id="closure-kick">private event</span>
       <p class="closure-head" id="closure-head">closed for a private event</p>
+      <ul class="closure-dates" id="closure-dates" hidden></ul>
       <p class="closure-msg" id="closure-msg"></p>
     </div>
     <div class="closure-when" id="closure-when"></div>
   </div>
+  <p class="closure-pv mono" id="closure-pv" hidden></p>
 </aside>
 
 <nav>
@@ -232,25 +234,64 @@
     if(dd===1)return (p.h>=17?'tomorrow night':'tomorrow')+' at '+c;
     if(dd>1&&dd<7)return CL_DAYS[p.wd]+' at '+c;
     return CL_DAYS[p.wd].slice(0,3)+', '+['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][p.mon-1]+' '+p.dt+' at '+c}
+  function clShort(p){return CL_DAYS[p.wd].slice(0,3)+', '+['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'][p.mon-1]+' '+p.dt}
+  /* one closed date as a short label: "sat, dec 6 · 4pm–9pm", "thu, nov 27", "wed, dec 24 – fri, dec 26", "wed, dec 24 4pm → back fri, dec 26 4pm" */
+  function clChip(w){
+    if(w.re===Infinity)return (w.st?clShort(clParts(w.st))+' '+clClock(clParts(w.st)):'now')+' → back open: pick a time';
+    var r=clParts(w.re);
+    if(!w.st)return 'now → back '+clShort(r)+' '+clClock(r);
+    var a=clParts(w.st),am=!a.h&&!a.mi,rm=!r.h&&!r.mi,days=Math.round((r.day-a.day)/864e5);
+    if(!days)return clShort(a)+' · '+(am?'until '+clClock(r):clClock(a)+'–'+clClock(r));
+    if(am&&rm)return days===1?clShort(a):clShort(a)+' – '+clShort(clParts(w.re-864e5));
+    return clShort(a)+(am?'':' '+clClock(a))+' → back '+clShort(r)+' '+clClock(r);
+  }
+  /* when a closure starts: "tonight from 8pm", or just the day when it's closed all day ("thursday") */
+  function clFrom(t,now){var p=clParts(t),x=clPhrase(t,now);return !p.h&&!p.mi?x.replace(/ at midnight$/,''):x.replace(' at ',' from ')}
+  var CL_KIND={private:'private event',holiday:'holiday hours'};
+  var CL_HEAD={thanksgiving:'closed for thanksgiving',christmas:'closed for christmas',newyear:'closed for new year’s',wedding:'closed for a wedding',holiday:'closed for the holiday',private:'closed for a private event'};
+  var CL_DEF=Object.keys(CL_HEAD).map(function(k){return CL_HEAD[k]}).concat(["closed for new year's"]);
   function closure(X){
-    var bar=$('#closure'),note=$('#closure-note');
+    var bar=$('#closure'),note=$('#closure-note'),pv=$('#closure-pv');
     if(closure.timer)clearInterval(closure.timer);closure.timer=0;
-    function off(){bar.hidden=true;note.hidden=true;if(closure.timer)clearInterval(closure.timer)}
-    if(!X||!X.show||window.__PRERENDER__)return off();
-    var re=clTime(X.reopens),st=clTime(X.starts);
-    /* in the CMS preview, show it while the reopen time is still being picked */
-    if(!re&&PREVIEW)re=Infinity;
-    if(!re)return off();
-    var head=X.headline||'closed for a private event';
+    function off(){bar.hidden=true;note.hidden=true;pv.hidden=true;if(closure.timer)clearInterval(closure.timer)}
+    if(!X||window.__PRERENDER__)return off();
+    /* in the CMS preview the notice always shows, with a line saying when the live site won't */
+    if(!X.show&&!PREVIEW)return off();
+    var kind=X.kind==='holiday'?'holiday':'private',theme=CL_HEAD[X.theme]?X.theme:'classic';
+    var list=Array.isArray(X.dates)&&X.dates.length?X.dates:[{starts:X.starts,reopens:X.reopens}];
+    var all=list.map(function(d){d=d||{};return {st:clTime(d.starts),re:clTime(d.reopens)||(PREVIEW?Infinity:null)}})
+      .filter(function(w){return w.re&&(!w.st||w.st<w.re)}).sort(function(a,b){return (a.st||0)-(b.st||0)});
+    if(!all.length&&!PREVIEW)return off();
+    var hl=String(X.headline||'').trim(),head=hl&&CL_DEF.indexOf(hl.toLowerCase())<0?hl:CL_HEAD[theme==='classic'?kind:theme];
+    bar.className='closure t-'+theme;
     function tick(){
-      var now=Date.now();if(now>=re)return off();
-      var during=!st||now>=st,same=st&&!during&&re!==Infinity&&clParts(st).day===clParts(re).day,back=re===Infinity?'back open: pick a time':'back open '+(same?'at '+clClock(clParts(re)):clPhrase(re,now));
-      $('#closure-kick').textContent=during?'private event':'heads up · private event';
-      $('#closure-head').textContent=during?head:head+' '+clPhrase(st,now).replace(' at ',' from ');
+      var now=Date.now(),live=all.filter(function(w){return w.re>now}),why='';
+      if(!X.show)why='preview only · “show the notice” is off, so the site isn’t showing this';
+      else if(!all.length)why='preview only · add a date with a “back open at” time';
+      else if(!live.length)why='preview only · every date has passed, so the site isn’t showing this';
+      if(why&&!PREVIEW)return off();
+      var shown=live.length?live:all,cur=null,i;
+      for(i=0;i<live.length;i++)if(!live[i].st||live[i].st<=now){cur=live[i];break}
+      var next=cur||shown[0],during=!!cur||!live.length,many=shown.length>1,h=head,back='';
+      if(!next){back='back open: pick a time'}
+      else if(during||many){
+        if(cur||!live.length)back=next.re===Infinity?'back open: pick a time':'back open '+clPhrase(next.re,now);
+        else back='closed '+clFrom(next.st,now);
+      }else{
+        var same=next.re!==Infinity&&clParts(next.st).day===clParts(next.re).day;
+        h=head+' '+clFrom(next.st,now);
+        back=next.re===Infinity?'back open: pick a time':'back open '+(same?'at '+clClock(clParts(next.re)):clPhrase(next.re,now));
+      }
+      $('#closure-kick').textContent=(during?'':'heads up · ')+CL_KIND[kind];
+      $('#closure-head').textContent=h;
       $('#closure-when').textContent=back;
       $('#closure-msg').textContent=X.message||'';
-      note.innerHTML='<b>'+esc(during?head:head+' '+clPhrase(st,now).replace(' at ',' from '))+'.</b> '+esc(back)+'.';
-      bar.hidden=false;note.hidden=false;
+      var ul=$('#closure-dates');
+      ul.innerHTML=many?shown.map(function(w){return '<li'+(w===cur?' class="now"':'')+'>'+esc(clChip(w))+(w===cur?' <span class="mono">now</span>':'')+'</li>'}).join(''):'';
+      ul.hidden=!many;
+      note.innerHTML='<b>'+esc(h)+'.</b> '+(many?esc(shown.map(clChip).join(' · '))+'. ':'')+esc(back)+'.';
+      pv.textContent=why;pv.hidden=!why;bar.classList.toggle('is-pv',!!why);
+      bar.hidden=false;note.hidden=!!why;
     }
     tick();closure.timer=setInterval(tick,60000);
   }

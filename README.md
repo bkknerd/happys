@@ -8,7 +8,7 @@ events.html         the private events page: the space, what works here, inquiry
 css/site.css        styles shared by both pages
 content/            everything the owner can change
   general.json      contact, top of the page, storefront photo, email signup, footer
-  closure.json      the "closed for a private event" notice and when you reopen
+  closure.json      the "closed" notice: private event or holiday, design, dates closed
   hours.json        open days and times
   menu.json         menu sections and items
   photos.json       the "lately at happy's" strip
@@ -80,7 +80,7 @@ The short version:
 3. Change things. The preview on the right shows the real page with the unsaved changes, scrolled to the part being edited.
 4. **Publish → Publish now**. Netlify redeploys and the change is live in about a minute.
 
-Common jobs, all covered in the guide: closing for a private event, hours, menu items and prices, next month's music flyer, photos, reviews, the private events page.
+Common jobs, all covered in the guide: closing for a private event or holiday, hours, menu items and prices, next month's music flyer, photos, reviews, the private events page.
 
 ### How the previews work
 
