@@ -6,7 +6,7 @@
       "title": "live music",
       "body": "a local act every saturday night. here’s who’s playing this month.",
       "show_flyer": true,
-      "button_text": "follow for next month ↗",
+      "button_text": "follow for next month",
       "button_link": "https://www.instagram.com/happyscary/",
       "color": "yellow"
     },
@@ -14,7 +14,7 @@
       "label": "birthdays · work nights",
       "title": "book the bar",
       "body": "throw your thing at happy’s. see the space, what works here, and ask about a date.",
-      "button_text": "plan an event →",
+      "button_text": "plan an event",
       "button_link": "events.html",
       "color": "pink"
     }
