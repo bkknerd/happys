@@ -295,6 +295,9 @@ collections:
               - { label: Email, name: email, widget: string }
               - { label: Instagram handle (no @), name: instagram, widget: string }
               - { label: Directions link, name: directions_url, widget: string }
+              - { label: Google Business Profile link, name: google_profile, widget: string, required: false, hint: "In Google Maps, open happy's, tap Share, copy the link." }
+              - { label: Yelp page link, name: yelp, widget: string, required: false }
+              - { label: Facebook page link, name: facebook, widget: string, required: false, hint: "Leave empty until happy's has a Facebook page." }
           - label: Top of the page
             name: hero
             widget: object

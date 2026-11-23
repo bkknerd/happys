@@ -156,7 +156,7 @@
     <a class="footer-brand" href="#top" aria-label="Happy’s — back to top"><svg class="lg" viewBox="-4 -4 510 276" role="img" aria-label="happy’s — feel good"><use href="#logo"/></svg></a>
     <div><h2 class="footer-label">visit</h2><address id="foot-addr"></address><a data-maps href="#" target="_blank" rel="noopener">get directions ↗</a></div>
     <div><h2 class="footer-label">hours</h2><dl id="fhours"></dl></div>
-    <div><h2 class="footer-label">contact</h2><a data-tel href="#"><span data-t="contact.phone"></span></a><br><a data-mail href="#"><span data-t="contact.email"></span></a><br><a data-ig href="#" target="_blank" rel="noopener">instagram ↗</a></div>
+    <div><h2 class="footer-label">contact</h2><a data-tel href="#"><span data-t="contact.phone"></span></a><br><a data-mail href="#"><span data-t="contact.email"></span></a><br><a data-ig href="#" target="_blank" rel="noopener">instagram ↗</a><span data-prof></span></div>
   </div>
   <div class="footer-bottom"><small>© happy’s</small><span data-t="footer.note"></span><a class="credit" href="https://draftandlogic.com" target="_blank" rel="noopener">site by Draft and Logic ↗</a><a href="#top">back to top ↑</a></div>
 </footer>
@@ -207,6 +207,7 @@
     $$('[data-tel]').forEach(function(a){a.href='tel:+1'+String(ct.phone).replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'')});
     $$('[data-mail]').forEach(function(a){a.href='mailto:'+ct.email});
     $$('[data-maps]').forEach(function(a){a.href=ct.directions_url});
+    $$('[data-prof]').forEach(function(w){w.innerHTML=[['google_profile','google'],['yelp','yelp'],['facebook','facebook']].filter(function(p){return /^https:\/\//.test(ct[p[0]]||'')}).map(function(p){return '<br><a href="'+esc(ct[p[0]])+'" target="_blank" rel="noopener">'+p[1]+' ↗</a>'}).join('')});
     $('.hero-photo').style.backgroundImage='url("'+C.hero.image+'")';
     $('#q').placeholder=C.menu.search_placeholder;
     $('#em').placeholder=C.newsletter.placeholder;
@@ -427,7 +428,7 @@
     var ct=C.contact,ld={"@context":"https://schema.org","@type":"BarOrPub",name:"happy’s",description:"Cocktail bar and event space in downtown "+ct.city+", "+ct.state+".",
       telephone:'+1-'+String(ct.phone).replace(/\D/g,'').slice(-10).replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3'),email:ct.email,url:location.origin+'/',
       address:{"@type":"PostalAddress",streetAddress:ct.street,addressLocality:ct.city,addressRegion:ct.state,postalCode:ct.zip,addressCountry:"US"},
-      acceptsReservations:false,sameAs:['https://www.instagram.com/'+ct.instagram+'/'],
+      acceptsReservations:false,sameAs:['https://www.instagram.com/'+ct.instagram+'/',ct.google_profile,ct.yelp,ct.facebook].filter(function(u){return /^https:\/\//.test(u||'')}),
       openingHoursSpecification:Object.keys(by).map(function(d){var o=hrs(by[d].open),c=hrs(by[d].close,true);return {"@type":"OpeningHoursSpecification",dayOfWeek:"https://schema.org/"+cap(DL[d]),opens:hm(o||0),closes:hm(c||24)}})};
     var t0=new Date().toISOString().slice(0,10),evs=[];
     function off(day){try{var z=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',timeZoneName:'longOffset'}).formatToParts(new Date(day+'T12:00:00Z')).filter(function(p){return p.type==='timeZoneName'})[0].value.replace('GMT','');return z||'+00:00'}catch(e){return ''}}
