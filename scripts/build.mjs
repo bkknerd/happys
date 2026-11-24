@@ -123,6 +123,16 @@ for (const page of PAGES) {
     }
   }
 
+  // 3c. The stylesheet is small (about 7 KB sent compressed), so it goes inside the page instead of
+  // being a separate request the browser has to wait for before it can draw anything.
+  const sheet = doc.querySelector('link[rel=stylesheet][href="css/site.css"]');
+  if (sheet) {
+    const cssText = (await readFile(join(root, 'css', 'site.css'), 'utf8')).replace(/url\(\.\.\//g, 'url(');
+    const inline = doc.createElement('style');
+    inline.textContent = cssText;
+    sheet.replaceWith(inline);
+  }
+
   const outHtml = dom.serialize();
   dom.window.close();
   await writeFile(join(out, page.file), outHtml);
