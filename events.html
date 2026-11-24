@@ -276,6 +276,8 @@ nav a.l[aria-current=page]::after{transform:scaleX(1)}
       .then(function(r){
         if(!r.ok){var x=new Error('status '+r.status);x.status=r.status;throw x}
         form.hidden=true;var th=$('#pe-thanks');th.hidden=false;th.focus();
+        /* counted only once Netlify has accepted it; no names, emails or phone numbers go to analytics */
+        try{hpEv('generate_lead',{form_name:'event-inquiry',occasion:(form.elements.occasion&&form.elements.occasion.value)||''})}catch(x){}
       })
       .catch(function(x){
         console.warn('[happys] event inquiry did not send:',x&&x.message);

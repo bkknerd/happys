@@ -466,6 +466,7 @@
   });
   function thanks(){
     $('#f').hidden=true;$('#thx').hidden=false;
+    try{hpEv('sign_up',{method:'newsletter'})}catch(e){}
   }
 
   /* the hero smiley winks: once after the headline lands, then on hover or tap of the headline */

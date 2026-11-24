@@ -98,24 +98,24 @@ function hpEv(n,p){gtag('event',n,p||{})}</script>`;
 <script>
 (function(){
   function send(n,p){try{hpEv(n,p)}catch(e){}}
+  // Where on the page a link sits: nav, footer, or the id of its section (hero, events, visit...).
+  function where(a){if(a.closest('header,nav'))return 'nav';if(a.closest('footer'))return 'footer';var s=a.closest('section[id],[id^="pe-"]');return s?s.id:'page'}
+  function txt(a){return (a.textContent||'').replace(/\\s+/g,' ').trim().slice(0,60)}
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a,button');if(!a)return;
-    var h=a.getAttribute('href')||'';
-    if(h.indexOf('tel:')===0)send('call_click',{link_url:h});
-    else if(h.indexOf('mailto:')===0)send('email_click');
-    else if(a.hasAttribute('data-maps')||/google\\.[^/]+\\/maps/.test(h))send('get_directions');
-    else if(h.indexOf('instagram.com')>-1)send('instagram_click');
-    else if(/share\\.google|google\\.com\\/maps\\/place|g\\.page/.test(h))send('google_profile_click');
-    else if(h.indexOf('yelp.com')>-1)send('yelp_click');
-    else if(h.indexOf('facebook.com')>-1)send('facebook_click');
-    else if(/events\\.html/.test(h))send('book_event_click',{link_text:(a.textContent||'').trim().slice(0,60)});
-    else if(a.closest('#chips'))send('menu_filter',{category:(a.textContent||'').trim().toLowerCase()});
+    var h=a.getAttribute('href')||'',p={link_location:where(a),link_text:txt(a)};
+    if(h.indexOf('tel:')===0){p.link_url=h;send('call_click',p)}
+    else if(h.indexOf('mailto:')===0)send('email_click',p);
+    else if(a.hasAttribute('data-maps')||/google\\.[^/]+\\/maps/.test(h))send('get_directions',p);
+    else if(h.indexOf('instagram.com')>-1)send('instagram_click',p);
+    else if(/share\\.google|google\\.com\\/maps\\/place|g\\.page/.test(h))send('google_profile_click',p);
+    else if(h.indexOf('yelp.com')>-1)send('yelp_click',p);
+    else if(h.indexOf('facebook.com')>-1)send('facebook_click',p);
+    else if(/#events$/.test(h)){p.source_page=location.pathname;send('events_nav_click',p)}
+    else if(/events\\.html/.test(h)){p.source_page=location.pathname;send('book_event_click',p)}
+    else if(a.closest('#chips'))send('menu_filter',{category:txt(a).toLowerCase()});
   },true);
-  document.addEventListener('submit',function(e){
-    var f=e.target,n=f.getAttribute('name');
-    if(n==='newsletter')send('sign_up',{method:'newsletter'});
-    else if(n==='event-inquiry'&&(!f.checkValidity||f.checkValidity()))send('generate_lead',{form_name:'event-inquiry'});
-  },true);
+  // sign_up and generate_lead are sent by the forms themselves, only after Netlify confirms the send.
   function watch(){if(!('IntersectionObserver' in window))return;
     var seen={},io=new IntersectionObserver(function(es){es.forEach(function(x){var id=x.target.id;if(x.isIntersecting&&!seen[id]){seen[id]=1;send('view_section',{section:id});io.unobserve(x.target)}})},{rootMargin:'0px 0px -40% 0px'});
     ['menu','events','reviews','visit'].forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el)});
