@@ -12,7 +12,8 @@ const out = join(root, 'dist');
 const SKIP = new Set(['dist', 'analytics', 'node_modules', 'scripts', '.git', '.netlify', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'netlify.toml']);
 const SITE = 'https://happysnc.com/';
 
-// Phone copy of the hero photo: the slice a phone actually shows, written next to the original as name-phone.webp.
+// Phone copy of the hero photo: the slice a phone actually shows (the 60% center framing used on phones),
+// written next to the original as name-phone.webp.
 const PHONE_MAX = 600;
 const PHONE = `(max-width: ${PHONE_MAX}px)`;
 async function phoneCrop(src) {
@@ -94,10 +95,10 @@ for (const page of PAGES) {
   doc.querySelectorAll('.cat.closed').forEach((c) => c.classList.remove('closed'));
   doc.querySelectorAll('input[type=date][min]').forEach((i) => i.removeAttribute('min'));
 
-  // 3b. The hero photo is the biggest thing on a phone screen. It's a CSS background, so the browser
-  // wouldn't find it until the stylesheet loads: preload it so it starts downloading right away.
-  const heroBg = doc.querySelector('.hero-photo')?.style.backgroundImage || '';
-  const heroSrc = (heroBg.match(/url\(["']?([^"')]+)["']?\)/) || [])[1];
+  // 3b. The hero photo is the biggest thing on a phone screen. Preload it so it starts downloading
+  // right away, and give phones a cut-down copy of just the part they show.
+  const heroImg = doc.querySelector('.hero-photo img');
+  const heroSrc = heroImg?.getAttribute('src') || '';
   if (heroSrc) {
     const css = doc.querySelector('link[rel=stylesheet]');
     const preload = (href, media) => {
@@ -109,15 +110,15 @@ for (const page of PAGES) {
       if (media) pre.setAttribute('media', media);
       css ? css.before(pre) : doc.head.append(pre);
     };
-    // On a phone the photo is cropped to about a quarter of its width, so phones get a cut-down copy
-    // of just the part they show (same framing as background-position 60% center).
     const phone = await phoneCrop(heroSrc);
     if (phone) {
       preload(phone, PHONE);
       preload(heroSrc, `(min-width: ${PHONE_MAX + 1}px)`);
-      const style = doc.createElement('style');
-      style.textContent = `@media ${PHONE}{.hero-photo{background-image:url("${phone}")!important}}`;
-      css ? css.after(style) : doc.head.append(style);
+      const source = doc.createElement('source');
+      source.setAttribute('media', PHONE);
+      source.setAttribute('srcset', phone);
+      source.setAttribute('data-for', heroSrc);
+      heroImg.before(source);
     } else {
       preload(heroSrc);
     }
