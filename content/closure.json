@@ -1,13 +1,13 @@
 {
- "show": true,
- "kind": "private",
- "theme": "classic",
- "dates": [
-  {
-   "starts": "2026-11-19T13:03",
-   "reopens": "2026-11-19T18:00"
-  }
- ],
- "headline": "",
- "message": ""
+  "show": true,
+  "kind": "holiday",
+  "theme": "thanksgiving",
+  "dates": [
+    {
+      "starts": "",
+      "reopens": "2026-11-27T16:00"
+    }
+  ],
+  "headline": "",
+  "message": ""
 }
