@@ -71,6 +71,20 @@ for (const page of PAGES) {
   doc.querySelectorAll('.cat.closed').forEach((c) => c.classList.remove('closed'));
   doc.querySelectorAll('input[type=date][min]').forEach((i) => i.removeAttribute('min'));
 
+  // 3b. The hero photo is the biggest thing on a phone screen. It's a CSS background, so the browser
+  // wouldn't find it until the stylesheet loads: preload it so it starts downloading right away.
+  const heroBg = doc.querySelector('.hero-photo')?.style.backgroundImage || '';
+  const heroSrc = (heroBg.match(/url\(["']?([^"')]+)["']?\)/) || [])[1];
+  if (heroSrc) {
+    const pre = doc.createElement('link');
+    pre.setAttribute('rel', 'preload');
+    pre.setAttribute('as', 'image');
+    pre.setAttribute('href', heroSrc);
+    pre.setAttribute('fetchpriority', 'high');
+    const css = doc.querySelector('link[rel=stylesheet]');
+    css ? css.before(pre) : doc.head.append(pre);
+  }
+
   const outHtml = dom.serialize();
   dom.window.close();
   await writeFile(join(out, page.file), outHtml);
