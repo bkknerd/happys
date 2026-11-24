@@ -12,6 +12,29 @@ const out = join(root, 'dist');
 const SKIP = new Set(['dist', 'analytics', 'node_modules', 'scripts', '.git', '.netlify', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'netlify.toml']);
 const SITE = 'https://happysnc.com/';
 
+// Phone copy of the hero photo: the slice a phone actually shows, written next to the original as name-phone.webp.
+const PHONE_MAX = 600;
+const PHONE = `(max-width: ${PHONE_MAX}px)`;
+async function phoneCrop(src) {
+  if (/^(https?:)?\/\//.test(src)) return '';
+  try {
+    const { default: sharp } = await import('sharp');
+    const file = join(root, src.replace(/^\//, ''));
+    const img = sharp(file);
+    const { width, height } = await img.metadata();
+    const w = Math.min(width, Math.round(height * 0.75));
+    if (!width || !height || w >= width * 0.9) return '';
+    const left = Math.round((width - w) * 0.6);
+    const outSrc = src.replace(/\.[a-z0-9]+$/i, '') + '-phone.webp';
+    await mkdir(dirname(join(out, outSrc.replace(/^\//, ''))), { recursive: true });
+    await sharp(file).extract({ left, top: 0, width: w, height }).webp({ quality: 72 }).toFile(join(out, outSrc.replace(/^\//, '')));
+    return outSrc;
+  } catch (e) {
+    console.warn('hero phone crop skipped:', e.message);
+    return '';
+  }
+}
+
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 for (const name of await readdir(root)) {
@@ -76,13 +99,28 @@ for (const page of PAGES) {
   const heroBg = doc.querySelector('.hero-photo')?.style.backgroundImage || '';
   const heroSrc = (heroBg.match(/url\(["']?([^"')]+)["']?\)/) || [])[1];
   if (heroSrc) {
-    const pre = doc.createElement('link');
-    pre.setAttribute('rel', 'preload');
-    pre.setAttribute('as', 'image');
-    pre.setAttribute('href', heroSrc);
-    pre.setAttribute('fetchpriority', 'high');
     const css = doc.querySelector('link[rel=stylesheet]');
-    css ? css.before(pre) : doc.head.append(pre);
+    const preload = (href, media) => {
+      const pre = doc.createElement('link');
+      pre.setAttribute('rel', 'preload');
+      pre.setAttribute('as', 'image');
+      pre.setAttribute('href', href);
+      pre.setAttribute('fetchpriority', 'high');
+      if (media) pre.setAttribute('media', media);
+      css ? css.before(pre) : doc.head.append(pre);
+    };
+    // On a phone the photo is cropped to about a quarter of its width, so phones get a cut-down copy
+    // of just the part they show (same framing as background-position 60% center).
+    const phone = await phoneCrop(heroSrc);
+    if (phone) {
+      preload(phone, PHONE);
+      preload(heroSrc, `(min-width: ${PHONE_MAX + 1}px)`);
+      const style = doc.createElement('style');
+      style.textContent = `@media ${PHONE}{.hero-photo{background-image:url("${phone}")!important}}`;
+      css ? css.after(style) : doc.head.append(style);
+    } else {
+      preload(heroSrc);
+    }
   }
 
   const outHtml = dom.serialize();
@@ -105,9 +143,12 @@ if (GTM || GA) {
   const loader = GTM
     ? `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM}');</script>
 <script>function hpEv(n,p){var o={event:n};for(var k in p||{})o[k]=p[k];window.dataLayer.push(o)}</script>`
-    : `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA}');
-function hpEv(n,p){gtag('event',n,p||{})}</script>`;
+    // gtag.js waits until the page has loaded, so it doesn't compete with the hero photo on a slow phone connection.
+    // The page view and any early clicks queue in dataLayer and are sent as soon as it arrives.
+    : `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA}');
+function hpEv(n,p){gtag('event',n,p||{})}
+(function(){function go(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA}';document.head.appendChild(s)}
+if(document.readyState==='complete')go();else addEventListener('load',function(){setTimeout(go,0)})})();</script>`;
   const tag = `${loader}
 <script>
 (function(){
